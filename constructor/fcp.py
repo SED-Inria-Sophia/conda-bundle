@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, print_function
 
 from collections import defaultdict
 import json
-from os.path import getsize, isdir, isfile, join
+from os.path import getsize, isdir, isfile, islink, join
 import sys
 
 from constructor.utils import md5_files
@@ -121,11 +121,14 @@ def check_duplicates_files(pc_recs, platform, ignore_duplicate_files=False):
         paths_data = read_paths_json(extracted_package_dir).paths
         for path_data in paths_data:
             short_path = path_data.path
-            try:
-                size = (path_data.size_in_bytes or
-                        getsize(join(extracted_package_dir, short_path)))
-            except AttributeError:
-                size = getsize(join(extracted_package_dir, short_path))
+            if islink(join(extracted_package_dir, short_path)):
+                 size = 0
+            else:
+                try:
+                    size = (path_data.size_in_bytes or
+                            getsize(join(extracted_package_dir, short_path)))
+                except AttributeError:
+                    size = getsize(join(extracted_package_dir, short_path))
             total_extracted_pkgs_size += size
 
             map_members_scase[short_path].add(fn)
