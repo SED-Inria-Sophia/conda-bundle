@@ -1,7 +1,7 @@
 # (c) 2016 Anaconda, Inc. / https://anaconda.com
 # All Rights Reserved
 #
-# conda_bundle is distributed under the terms of the BSD 3-clause license.
+# conda-bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 from __future__ import absolute_import, division, print_function
@@ -18,7 +18,7 @@ from ..conda_interface import CONDA_INTERFACE_VERSION, conda_interface_type
 def main():
     print("sys.prefix: %s" % sys.prefix)
     print("sys.version: %s ..." % (sys.version[:40],))
-    print('conda_bundle version:', CONDA_BUNDLE_VERSION)
+    print('conda-bundle version:', CONDA_BUNDLE_VERSION)
     print('conda interface type:', conda_interface_type)
     print('conda interface version:', CONDA_INTERFACE_VERSION)
     print('location:', dirname(CONDA_BUNDLE_LOCATION))

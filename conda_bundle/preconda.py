@@ -1,7 +1,7 @@
 # (c) 2016 Anaconda, Inc. / https://anaconda.com
 # All Rights Reserved
 #
-# conda_bundle is distributed under the terms of the BSD 3-clause license.
+# conda-bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 import os
@@ -23,7 +23,7 @@ try:
 except:
     import ruamel_json as json
 
-files = '.conda_bundle-build.info', 'urls', 'urls.txt', 'env.txt'
+files = '.conda-bundle-build.info', 'urls', 'urls.txt', 'env.txt'
 
 
 def write_index_cache(info, dst_dir, used_packages):
@@ -92,7 +92,7 @@ def system_info():
 
 
 def write_files(info, dst_dir):
-    with open(join(dst_dir, '.conda_bundle-build.info'), 'w') as fo:
+    with open(join(dst_dir, '.conda-bundle-build.info'), 'w') as fo:
         json.dump(system_info(), fo)
 
     final_urls_md5s = tuple((get_final_url(info, url), md5) for url, md5 in info['_urls'])

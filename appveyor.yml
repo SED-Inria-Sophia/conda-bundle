@@ -59,5 +59,5 @@ build: false
 
 test_script:
   - call C:\test_conda\Scripts\activate
-  - pytest --cov=conda_bundle conda_bundle
+  - pytest --cov=conda-bundle conda-bundle
   - python scripts\\run_examples.py

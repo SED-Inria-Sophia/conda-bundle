@@ -815,7 +815,7 @@ Section "Install"
     File __CONDA_HISTORY__
 
     DetailPrint "Creating @NAME@ menus..."
-    push '"$INSTDIR\_conda.exe" conda_bundle --prefix "$INSTDIR" --make-menus @MENU_PKGS@'
+    push '"$INSTDIR\_conda.exe" bundle --prefix "$INSTDIR" --make-menus @MENU_PKGS@'
     push 'Failed to create menus'
     call AbortRetryNSExecWait
 
@@ -878,7 +878,7 @@ Section "Uninstall"
     # Remove menu items, path entries
 
     DetailPrint "Deleting @NAME@ menus..."
-    nsExec::ExecToLog '"$INSTDIR\_conda.exe" conda_bundle --prefix "$INSTDIR" --rm-menus'
+    nsExec::ExecToLog '"$INSTDIR\_conda.exe" bundle --prefix "$INSTDIR" --rm-menus'
 
     # ensure that MSVC runtime DLLs are on PATH during uninstallation
     ReadEnvStr $0 PATH

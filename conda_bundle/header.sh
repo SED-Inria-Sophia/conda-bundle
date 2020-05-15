@@ -359,7 +359,7 @@ unset PYTHON_SYSCONFIGDATA_NAME _CONDA_PYTHON_SYSCONFIGDATA_NAME
 
 CONDA_EXEC="$PREFIX/conda.exe"
 # 3-part dd from https://unix.stackexchange.com/a/121798/34459
-# this is similar below with the tarball payload - see shar.py in conda_bundle to see how
+# this is similar below with the tarball payload - see shar.py in conda-bundle to see how
 #    these values are computed.
 {
     dd if="$THIS_PATH" bs=1 skip=@CON_EXE_OFFSET_BYTES@ count=@CON_EXE_START_REMAINDER@ 2>/dev/null
@@ -377,12 +377,12 @@ printf "Unpacking payload ...\n"
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_OFFSET_BYTES@ count=@TARBALL_START_REMAINDER@ 2>/dev/null
     dd if="$THIS_PATH" bs=@BLOCK_SIZE@ skip=@TARBALL_BLOCK_OFFSET@ count=@TARBALL_SIZE_BLOCKS@ 2>/dev/null
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_REMAINDER_OFFSET@ count=@TARBALL_END_REMAINDER@ 2>/dev/null
-} | "$CONDA_EXEC" conda_bundle --extract-tar --prefix "$PREFIX"
+} | "$CONDA_EXEC" bundle --extract-tar --prefix "$PREFIX"
 
-"$CONDA_EXEC" conda_bundle --prefix "$PREFIX" --extract-conda-pkgs || exit 1
+"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-conda-pkgs || exit 1
 
 PRECONDA="$PREFIX/preconda.tar.bz2"
-"$CONDA_EXEC" conda_bundle --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
+"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
 rm -f "$PRECONDA"
 
 #if has_pre_install
@@ -423,7 +423,7 @@ CONDA_PKGS_DIRS="$PREFIX/pkgs" \
 __INSTALL_COMMANDS__
 
 POSTCONDA="$PREFIX/postconda.tar.bz2"
-"$CONDA_EXEC" conda_bundle --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
+"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
 rm -f "$POSTCONDA"
 
 rm -f $PREFIX/conda.exe

@@ -1,7 +1,7 @@
 # (c) 2016-2017 Anaconda, Inc. / http://anaconda.com
 # All Rights Reserved
 #
-# conda_bundle is distributed under the terms of the BSD 3-clause license.
+# conda-bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 import re
@@ -80,18 +80,18 @@ if bdist_wheel:
 
 
 setup(
-    name="conda_bundle",
+    name="conda-bundle",
     version=versioneer.get_version(),
     cmdclass=cmdclass,
     author="Anaconda, Inc.",
     author_email="conda@anaconda.com",
-    url="https://github.com/SED-Inria-Sophia/conda_bundle",
+    url="https://github.com/SED-Inria-Sophia/conda-bundle",
     license="BSD",
     description="create installer from conda packages",
     long_description=open(join(SETUP_PY_DIR, "README.md")).read(),
     packages=["conda_bundle", "conda_bundle.tests"],
     entry_points={
-        "console_scripts": ["conda_bundle=conda_bundle.main:main"],
+        "console_scripts": ["conda-bundle=conda_bundle.main:main"],
     },
     install_requires=[
         "conda >=4.6",

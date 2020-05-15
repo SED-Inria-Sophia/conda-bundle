@@ -1,5 +1,5 @@
 package:
-  name: conda_bundle
+  name: conda-bundle
   version: {{ GIT_DESCRIBE_TAG }}.{{ GIT_BUILD_STR }}
 
 source:
@@ -11,7 +11,7 @@ build:
   script:
     - pip install --no-deps -vv .
   entry_points:
-    - conda_bundle=conda_bundle.main:main
+    - conda-bundle=conda_bundle.main:main
 
 
 requirements:
@@ -30,8 +30,8 @@ test:
   imports:
     - conda_bundle
   commands:
-    - conda_bundle -V
-    - conda_bundle --test .
+    - conda-bundle -V
+    - conda-bundle --test .
 
 about:
   home: https://conda.io
@@ -42,7 +42,7 @@ about:
     Conda-bundle is a tool for constructing an installer for an app that should be
     distributed with its own conda environment.
   doc_url: https://conda.io/projects/conda/en/latest/
-  dev_url: https://github.com/SED-Inria-Sophia/conda_bundle
+  dev_url: https://github.com/SED-Inria-Sophia/conda-bundle
 
 extra:
   recipe-maintainers:

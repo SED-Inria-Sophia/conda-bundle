@@ -1,7 +1,7 @@
 # (c) 2016 Anaconda, Inc. / https://anaconda.com
 # All Rights Reserved
 #
-# conda_bundle is distributed under the terms of the BSD 3-clause license.
+# conda-bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 import sys

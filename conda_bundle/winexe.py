@@ -1,7 +1,7 @@
 # (c) 2016 Anaconda, Inc. / https://anaconda.com
 # All Rights Reserved
 #
-# conda_bundle is distributed under the terms of the BSD 3-clause license.
+# conda-bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 from __future__ import absolute_import, division, print_function
@@ -62,7 +62,7 @@ def pkg_commands(download_dir, dists, py_version, keep_pkgs, attempt_hardlinks, 
     # Extract all the .conda and .tar.bz2 conda packages
     yield r'SetDetailsPrint TextOnly'
     yield r'DetailPrint "Setting up the package cache ..."'
-    cmd = r'"$INSTDIR\_conda.exe" conda_bundle --prefix "$INSTDIR" --extract-conda-pkgs'
+    cmd = r'"$INSTDIR\_conda.exe" bundle --prefix "$INSTDIR" --extract-conda-pkgs'
     yield "nsExec::ExecToLog '%s'" % cmd
     yield "Pop $0"
     yield r'SetDetailsPrint both'
