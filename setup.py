@@ -1,7 +1,7 @@
 # (c) 2016-2017 Anaconda, Inc. / http://anaconda.com
 # All Rights Reserved
 #
-# constructor is distributed under the terms of the BSD 3-clause license.
+# conda_bundle is distributed under the terms of the BSD 3-clause license.
 # Consult LICENSE.txt or http://opensource.org/licenses/BSD-3-Clause.
 
 import re
@@ -33,7 +33,7 @@ def get_package_data(platform):
     else:
         platform = platform if platform in platform_package_data else "unix"
         package_data = platform_package_data[platform]
-    return {"constructor": package_data}
+    return {"conda_bundle": package_data}
 
 
 class PlatformSpecificDistribution(Distribution):
@@ -80,18 +80,18 @@ if bdist_wheel:
 
 
 setup(
-    name="constructor",
+    name="conda_bundle",
     version=versioneer.get_version(),
     cmdclass=cmdclass,
     author="Anaconda, Inc.",
     author_email="conda@anaconda.com",
-    url="https://github.com/conda/constructor",
+    url="https://github.com/SED-Inria-Sophia/conda_bundle",
     license="BSD",
     description="create installer from conda packages",
     long_description=open(join(SETUP_PY_DIR, "README.md")).read(),
-    packages=["constructor", "constructor.tests"],
+    packages=["conda_bundle", "conda_bundle.tests"],
     entry_points={
-        "console_scripts": ["constructor = constructor.main:main"],
+        "console_scripts": ["conda_bundle=conda_bundle.main:main"],
     },
     install_requires=[
         "conda >=4.6",

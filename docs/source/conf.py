@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'constructor'
+project = 'conda_bundle'
 copyright = '2019, Anaconda'
 author = 'Anaconda'
 

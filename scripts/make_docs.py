@@ -6,7 +6,7 @@ REPO_ROOT = dirname(dirname(__file__))
 
 sys.path.insert(0, REPO_ROOT)
 
-from constructor import construct
+from conda-bundle import construct
 
 
 valid_platforms = construct.ns_platform(sys.platform)
@@ -15,7 +15,7 @@ template = """
 # Keys in `construct.yaml` file:
 
 This document describes each of they keys in the `construct.yaml` file,
-which is the main configuration file of a constructor configuration
+which is the main configuration file of a conda-bundle configuration
 directory.
 
 All keys are optional, except otherwise noted.  Also, the keys `specs`

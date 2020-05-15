@@ -30,7 +30,7 @@ def run_examples():
             example_paths.append(fpath)
 
     for i, example_path in enumerate(sorted(example_paths)):
-        cmd = ['constructor', example_path]
+        cmd = ['conda_bundle', example_path]
         p = subprocess.Popen(cmd, stderr=subprocess.PIPE)
         print('\n\n# Testing example {}:\n--------------------'.format(i + 1))
         print(example_path)

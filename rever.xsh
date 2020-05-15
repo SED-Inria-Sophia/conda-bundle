@@ -10,7 +10,7 @@ $ACTIVITIES = [
 #
 # Basic settings
 #
-$PROJECT = $GITHUB_REPO = "constructor"
+$PROJECT = $GITHUB_REPO = "conda_bundle"
 $GITHUB_ORG = "conda"
 $AUTHORS_FILENAME = "AUTHORS.txt"
 
