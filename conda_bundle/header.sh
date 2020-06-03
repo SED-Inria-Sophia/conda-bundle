@@ -60,8 +60,12 @@ fi
 THIS_DIR=$(DIRNAME=$(dirname "$0"); cd "$DIRNAME"; pwd)
 THIS_FILE=$(basename "$0")
 THIS_PATH="$THIS_DIR/$THIS_FILE"
+#if osx
+PREFIX="/Applications"
+#else
 RAW_PREFIX=__DEFAULT_PREFIX__
 PREFIX="$RAW_PREFIX/__NAME__"
+#endif
 BATCH=0
 FORCE=0
 SKIP_SCRIPTS=0
@@ -337,6 +341,14 @@ if ! mkdir -p "$PREFIX"; then
     exit 1
 fi
 
+#if osx
+mkdir  "$PREFIX/__NAME__.app"
+mkdir  "$PREFIX/__NAME__.app/Contents"
+mkdir  "$PREFIX/__NAME__.app/Contents/MacOS"
+mkdir  "$PREFIX/__NAME__.app/Contents/Resources"
+PREFIX="$PREFIX/__NAME__.app/Contents/Resources"
+#endif
+
 PREFIX=$(cd "$PREFIX"; pwd)
 export PREFIX
 
@@ -382,12 +394,12 @@ printf "Unpacking payload ...\n"
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_OFFSET_BYTES@ count=@TARBALL_START_REMAINDER@ 2>/dev/null
     dd if="$THIS_PATH" bs=@BLOCK_SIZE@ skip=@TARBALL_BLOCK_OFFSET@ count=@TARBALL_SIZE_BLOCKS@ 2>/dev/null
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_REMAINDER_OFFSET@ count=@TARBALL_END_REMAINDER@ 2>/dev/null
-} | "$CONDA_EXEC" bundle --extract-tar --prefix "$PREFIX"
+} | "$CONDA_EXEC" constructor --extract-tar --prefix "$PREFIX"
 
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-conda-pkgs || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-conda-pkgs || exit 1
 
 PRECONDA="$PREFIX/preconda.tar.bz2"
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
 rm -f "$PRECONDA"
 
 #if has_pre_install
@@ -429,7 +441,7 @@ CONDA_PKGS_DIRS="$PREFIX/pkgs" \
 ## ==INSTALL_COMMANDS== ## NOTE: replaced __ with == to avoid macro expansion - I don't know what this does!
 
 POSTCONDA="$PREFIX/postconda.tar.bz2"
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
 rm -f "$POSTCONDA"
 
 rm -f $PREFIX/conda.exe
@@ -458,6 +470,11 @@ fi
 rm -f "$MSGS"
 #if not keep_pkgs
 rm -rf "$PREFIX"/pkgs
+#endif
+
+#if osx
+cp "$PREFIX/misc/macOS/Info.plist" "$PREFIX/../"
+cp "$PREFIX/misc/macOS/__NAME__" "$PREFIX/../MacOS/"
 #endif
 
 printf "installation finished.\\n"
@@ -523,7 +540,7 @@ printf "installation finished.\\n"
 
         # printf "Thank you for installing __NAME__!\\n"
 
-fi # !BATCH
+# fi # !BATCH
 
 if [ "$TEST" = "1" ]; then
     printf "INFO: Running package tests in a subshell\\n"
