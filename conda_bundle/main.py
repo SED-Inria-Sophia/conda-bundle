@@ -28,7 +28,7 @@ def set_installer_type(info):
         os_map = {'linux': 'sh', 'osx': 'pkg', 'win': 'exe'} # these are default types for each OS
         info['installer_type'] = os_map[osname]
 
-    allowed_types = 'sh', 'pkg', 'exe' #, 'tar.bz2' # TODO: implement tar.bz2 with conda-pack 
+    allowed_types = 'sh', 'pkg', 'exe', 'tar.bz2' # TODO: implement tar.bz2 with conda-pack 
     itype = info['installer_type']
     if itype not in allowed_types:
         sys.exit("Error: invalid installer type '%s',\n"
@@ -90,8 +90,8 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
             sys.exit("Error: Can only create .exe installer on Windows.")
         from .winexe import create
     if info['installer_type'] == 'tar.bz2':
-        if sys.platform == 'win32':
-            sys.exit("Error: Cannot create .tar.bz2 installer on Windows.")
+        if sys.platform != 'linux':
+            sys.exit("Error: Can only create .tar.bz2 package on Linux.")
         from .tarbz2 import create
 
     if verbose:
@@ -122,6 +122,7 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
 
     fcp_main(info, verbose=verbose, dry_run=dry_run)
     if dry_run:
+        print(info)
         print("Dry run, no installer created.")
         return
 

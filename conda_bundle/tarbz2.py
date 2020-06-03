@@ -21,7 +21,9 @@ from .utils import add_condarc, filename_dist, fill_template, md5_files, preproc
 from conda_pack import pack
 
 from conda_build import environ, source, tarcheck, utils
-from conda_env import env
+from conda_env import cli as env_cli
+from conda.cli import python_api
+from multiprocessing import cpu_count
 
 THIS_DIR = dirname(__file__)
 
@@ -32,10 +34,34 @@ def create(info, verbose=False):
     except:
         pass
     tmp_dir = tempfile.mkdtemp(dir=tmp_dir_base_path)
-        env
 
-    os.unlink(tarball)
-    os.chmod(shar_path, 0o755)
+    # 1) create a temporary conda environment
+    python_api.run_command('create', '-p', tmp_dir)
+    print("temporary environment created at: %s" % tmp_dir)
 
+    # 2) install in this temporary environment all final packages
+    arg_info_channels = list()
+    arg_info_channels.append('-p')
+    arg_info_channels.append(tmp_dir)
+    for channel in info['channels']:
+        arg_info_channels.append('-c')
+        arg_info_channels.append(channel)
+    for package in info['specs']:
+        arg_info_channels.append(package)
+    print("running command: install", arg_info_channels)
+    python_api.run_command('install', arg_info_channels)
+    print("Installation done.")
+
+    # 3) pack the whole thing
+    print("Packing environment as tar.bz2 using %d threads.", cpu_count())
+    pack(prefix=tmp_dir,
+        output=info['_outpath'],
+        format='tar.bz2',
+        compress_level=1,
+        n_threads=cpu_count())
+
+    # os.unlink(tarball)
+    # os.chmod(shar_path, 0o755)
+    print("Packing done. Removing temporary dir.")
     shutil.rmtree(tmp_dir)
 
