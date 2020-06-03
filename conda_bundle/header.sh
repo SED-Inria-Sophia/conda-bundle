@@ -450,7 +450,7 @@ rm -f $PREFIX/pkgs/env.txt
 rm -rf $PREFIX/install_tmp
 export TMP="$TMP_BACKUP"
 
-mkdir -p $PREFIX/envs
+# mkdir -p $PREFIX/envs
 
 #if has_post_install
 if [ "$SKIP_SCRIPTS" = "1" ]; then
@@ -538,7 +538,7 @@ printf "installation finished.\\n"
         # printf "conda config --set auto_activate_base false\\n"
         # printf "\\n"
 
-        # printf "Thank you for installing __NAME__!\\n"
+        printf "Thank you for installing __NAME__!\\n"
 
 # fi # !BATCH
 
