@@ -35,7 +35,7 @@ def set_installer_type(info):
                  "allowed types are: %s" % (itype, allowed_types))
 
     if ((osname == 'linux' and itype not in ('sh', 'tar.bz2')) or
-        (osname == 'osx' and itype not in ('sh', 'pkg')) or
+        (osname == 'osx' and itype not in ('sh', 'pkg', 'tar.bz2')) or
         (osname == 'win' and itype != 'exe')):
         sys.exit("Error: cannot create '.%s' installer for %s" % (itype,
                                                                   osname))
@@ -83,15 +83,15 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
         from .shar import create
     elif info['installer_type'] == 'pkg':
         if sys.platform != 'darwin':
-            sys.exit("Error: Can only create .pkg installer on OSX.")
+            sys.exit("Error: Can only create .pkg installer on macOS.")
         from .osxpkg import create
     elif info['installer_type'] == 'exe':
         if sys.platform != 'win32':
             sys.exit("Error: Can only create .exe installer on Windows.")
         from .winexe import create
     if info['installer_type'] == 'tar.bz2':
-        if sys.platform != 'linux':
-            sys.exit("Error: Can only create .tar.bz2 package on Linux.")
+        if sys.platform == 'win32':
+            sys.exit("Error: Cannot create .tar.bz2 package on Windows.")
         from .tarbz2 import create
 
     if verbose:
