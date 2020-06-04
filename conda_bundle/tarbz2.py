@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division, print_function
 
 import os
+import stat
 from os.path import basename, dirname, getsize, isdir, join
 import shutil
 import tarfile
@@ -21,11 +22,17 @@ from .utils import add_condarc, filename_dist, fill_template, md5_files, preproc
 from conda_pack import pack
 
 from conda_build import environ, source, tarcheck, utils
-from conda_env import cli as env_cli
 from conda.cli import python_api
 from multiprocessing import cpu_count
 
 THIS_DIR = dirname(__file__)
+
+
+def read_launch_template():
+    path = join(THIS_DIR, 'launch.sh')
+    print('Reading: %s' % path)
+    with open(path) as fi:
+        return fi.read()
 
 def create(info, verbose=False):
     tmp_dir_base_path = join(dirname(info['_outpath']), "tmp")
@@ -48,15 +55,29 @@ def create(info, verbose=False):
         arg_info_channels.append(channel)
     for package in info['specs']:
         arg_info_channels.append(package)
-    print("running command: install", arg_info_channels)
+    print("Installing packages:", info['specs'])
     python_api.run_command('install', arg_info_channels)
     print("Installation done.")
 
+    replace = {
+        'NAME': info['name'],
+        'name': info['name'].lower(),
+        'VERSION': info['version'],
+        'ENTRY_POINT': info['entry_point']
+    }
+    data = read_launch_template()
+    data = fill_template(data, replace)
+    with open(join(tmp_dir, 'launch.sh'), 'wb') as fo:
+        fo.write(data.encode('utf-8'))
+    os.chmod(join(tmp_dir, 'launch.sh'), stat.S_IRWXU + stat.S_IRGRP + stat.S_IROTH)
+
     # 3) pack the whole thing
-    print("Packing environment as tar.bz2 using %d threads.", cpu_count())
+    archive_format = 'tar.bz2'
+    print("Packing environment as %s using %d threads." % (archive_format, cpu_count()))
     pack(prefix=tmp_dir,
         output=info['_outpath'],
-        format='tar.bz2',
+        format=archive_format,
+        force=True,
         compress_level=1,
         n_threads=cpu_count())
 

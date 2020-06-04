@@ -208,6 +208,14 @@ Default choice for whether to register the installed Python instance as the
 system's default Python. The user is still able to change this during
 interactive installation. (Windows only)
 '''),
+
+    ('entry_point',  False, str, '''
+ The entry point of the app (mandatory for tar.bz2):
+    for Linux usually bin/myapp 
+    for macOS usually bin/myapp.app/Contents/MacOS/myapp
+    for Windows usually Library/bin/myapp.exe
+ ''')
+
 ]
 
 
