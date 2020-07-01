@@ -90,6 +90,22 @@ def make_nsi(info, dir_path):
     arch = int(info['_platform'].split('-')[1])
     info['post_install_desc'] = info.get('post_install_desc', "")
 
+    start_menu_commands = ""
+    desktop_commands = ""
+    registry_key_commands = ""
+    start_menu_delete_commands = ""
+    desktop_delete_commands = ""
+
+    # these are NSIS commands to create shortcuts, registry keys, and delete shortcuts.
+    for t in info['shortcuts'].values():
+        for key in 'path', 'icon':
+            t[key] = t[key].replace("__INSTALL_PATH__", "$INSTDIR")
+        start_menu_commands = start_menu_commands + f'CreateShortCut "$SMPROGRAMS\\{t["name"]}.lnk" "{t["path"]}" "" "{t["icon"]}"\n'
+        desktop_commands = desktop_commands + f'CreateShortCut "$DESKTOP\\{t["name"]}.lnk "{t["path"]}" "" "{t["icon"]}"\n'
+        registry_key_commands = registry_key_commands + 'WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" ' + f'{t["path"]}"\n'
+        start_menu_delete_commands = start_menu_delete_commands + f'Delete "$SMPROGRAMS\\{t["name"]}.lnk"\n'
+        desktop_delete_commands = desktop_delete_commands + f'Delete "$DESKTOP\\{t["name"]}.lnk"\n'
+
     # these appear as __<key>__ in the template, and get escaped
     replace = {
         'NAME': name,
@@ -153,6 +169,11 @@ def make_nsi(info, dir_path):
         ('@UNINSTALL_NAME@', info.get('uninstall_name',
             '${NAME} ${VERSION} (Python ${PYVERSION} ${ARCH})'
         )),
+        ("@START_MENU_CREATE_SHORTCUT_EXE@",  start_menu_commands),
+        ("@DESKTOP_CREATE_SHORTCUT_EXE@", desktop_commands),
+        ("@REGISTRY_INSTDIR_KEY_EXE@", registry_key_commands),
+        ("@START_MENU_DELETE_SHORTCUT_EXE@", start_menu_delete_commands),
+        ("@DESKTOP_DELETE_SHORTCUT_EXE@", desktop_delete_commands),
         ]:
         data = data.replace(key, value)
 
@@ -190,6 +211,7 @@ Error: no file %s
 
 
 def create(info, verbose=False):
+
     verify_nsis_install()
     tmp_dir = tempfile.mkdtemp()
     preconda_write_files(info, tmp_dir)

@@ -208,6 +208,14 @@ Default choice for whether to register the installed Python instance as the
 system's default Python. The user is still able to change this during
 interactive installation. (Windows only)
 '''),
+
+    ('shortcuts',  False, dict, '''
+ The entry point of the app (mandatory), assuming the install folder is __INSTALL_PATH__:
+    for Linux usually bin/myapp
+    for macOS usually bin/myapp.app/Contents/MacOS/myapp
+    for Windows usually Library/bin/myapp.exe
+    it's a list, so you can specify multiple of them to create multiple shortcuts on Windows.
+ ''')
 ]
 
 
