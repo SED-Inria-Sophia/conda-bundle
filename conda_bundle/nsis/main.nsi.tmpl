@@ -824,6 +824,7 @@ Section "Install"
     # TODO: replace with keys
     # CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
     # CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
+    CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
     @START_MENU_CREATE_SHORTCUT_EXE@
     @DESKTOP_CREATE_SHORTCUT_EXE@
 
@@ -874,6 +875,7 @@ Section "Uninstall"
     # Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
     @START_MENU_DELETE_SHORTCUT_EXE@
     @DESKTOP_DELETE_SHORTCUT_EXE@
+    RMDir "$SMPROGRAMS\${PRODUCT_NAME}"
 
     # ensure that MSVC runtime DLLs are on PATH during uninstallation
     ReadEnvStr $0 PATH
