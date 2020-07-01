@@ -62,7 +62,7 @@ def pkg_commands(download_dir, dists, py_version, keep_pkgs, attempt_hardlinks, 
     # Extract all the .conda and .tar.bz2 conda packages
     yield r'SetDetailsPrint TextOnly'
     yield r'DetailPrint "Setting up the package cache ..."'
-    cmd = r'"$INSTDIR\_conda.exe" bundle --prefix "$INSTDIR" --extract-conda-pkgs'
+    cmd = r'"$INSTDIR\_conda.exe" constructor --prefix "$INSTDIR" --extract-conda-pkgs'
     yield "nsExec::ExecToLog '%s'" % cmd
     yield "Pop $0"
     yield r'SetDetailsPrint both'
