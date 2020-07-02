@@ -64,6 +64,11 @@ var /global InstModePage_RadioButton_JustMe
 var /global InstModePage_RadioButton_AllUsers
 
 var /global InstMode # 0 = Just Me, 1 = All Users.
+
+Var /GLOBAL CreateStartMenuShortcuts
+Var /GLOBAL CreateDesktopShortcuts
+Var /GLOBAL RegisterShell
+
 !define JUST_ME 0
 !define ALL_USERS 1
 
@@ -117,6 +122,7 @@ Page Custom InstModePage_Create InstModePage_Leave
 !insertmacro MUI_PAGE_DIRECTORY
 # Custom options now differ depending on installation mode.
 # Page Custom mui_AnaCustomOptions_Show ;Used to register conda to path, disabled in our case.
+Page Custom mui_CustomShortcuts_Show
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -524,6 +530,10 @@ Function .onInit
     StrCpy $Ana_RegisterSystemPython_State ${BST_UNCHECKED}
 #endif
 
+    StrCpy ${CreateStartMenuShortcuts} ${BST_CHECKED}
+    StrCpy ${CreateDesktopShortcuts} ${BST_CHECKED}
+    StrCpy ${RegisterShell} ${BST_CHECKED}
+
     Call OnInit_Release
 
     Pop $R2
@@ -819,6 +829,7 @@ Section "Install"
     SetOutPath "$INSTDIR\conda-meta"
     File __CONDA_HISTORY__
 
+${If} StrCmp ${CREATE_START_MENU_SHORTCUT} ${BST_CHECKED}
     DetailPrint "Creating @NAME@ menus..."
 
     # TODO: replace with keys
@@ -826,7 +837,18 @@ Section "Install"
     # CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
     CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
     @START_MENU_CREATE_SHORTCUT_EXE@
+${EndIf}
+
+${If} StrCmp ${CREATE_DESKTOP_SHORTCUT} ${BST_CHECKED}
     @DESKTOP_CREATE_SHORTCUT_EXE@
+${EndIf}
+
+${If} StrCmp ${RegisterShell} ${BST_CHECKED}
+    WriteRegStr HKCR "\Directory\Background\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr HKCR "\Directory\Background\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+    WriteRegStr HKCR "\Directory\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr HKCR "\Directory\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+${EndIf}
 
 /*
     push '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\Lib\_nsis.py" mkdirs'
@@ -873,9 +895,20 @@ Section "Uninstall"
     # TODO: replace with keys
     # Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
     # Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
+
+${If} StrCmp ${CREATE_START_MENU_SHORTCUT} ${BST_CHECKED}
     @START_MENU_DELETE_SHORTCUT_EXE@
+${EndIf}
+
+${If} StrCmp ${CREATE_DESKTOP_SHORTCUT} ${BST_CHECKED}
     @DESKTOP_DELETE_SHORTCUT_EXE@
     RMDir "$SMPROGRAMS\${PRODUCT_NAME}"
+${EndIf}
+
+${If} StrCmp ${RegisterShell} ${BST_CHECKED}
+    DeleteRegKey HKCR "\Directory\Background\shell\${NAME}"
+    DeleteRegKey HKCR "\Directory\shell\${NAME}"
+${EndIf}
 
     # ensure that MSVC runtime DLLs are on PATH during uninstallation
     ReadEnvStr $0 PATH

@@ -43,6 +43,37 @@ FunctionEnd
 ;--------------------------------
 ;Page functions
 
+Function mui_CustomShortcuts_Show
+    ;Create dialog
+    nsDialogs::Create 1018
+    Pop $mui_AnaCustomOptions
+    ${If} $mui_AnaCustomOptions == error
+        Abort
+    ${EndIf}
+
+    !insertmacro MUI_HEADER_TEXT \
+        "Shortcuts options" \
+        "Customize how ${NAME} integrates with Windows"
+    
+
+    ${NSD_CreateGroupBox} 0u 0u 100% 140u "Shortcuts Options"
+    Pop $0
+
+    ${NSD_CreateCheckbox} 20u 30u 250u 10u \
+        "Create shortcuts for ${NAME} in the Start Menu"
+    Pop $CreateStartMenuShortcuts
+
+    ${NSD_CreateCheckbox} 20u 60u 250u 10u \
+        "Create shortcuts for ${NAME} on the Desktop"
+    Pop $CreateDesktopShortcuts
+
+    ${NSD_CreateCheckbox} 20u 90u 250u 10u \
+        "Add an option $\"Open ${NAME} Prompt here$\" to the right-click menu in Windows Explorer"
+    Pop $RegisterShell
+
+    nsDialogs::Show
+FunctionEnd
+
 Function mui_AnaCustomOptions_Show
     ; Enforce that the defaults were initialized
     ${If} $Ana_AddToPath_State == ""
