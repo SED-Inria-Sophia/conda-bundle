@@ -16,6 +16,12 @@ Var Ana_AddToPath_State
 Var Ana_RegisterSystemPython_State
 Var Ana_NoScripts_State
 
+# These are checkboxes
+Var CreateStartMenuShortcuts
+Var CreateDesktopShortcuts
+Var RegisterShell
+
+
 Var Ana_AddToPath_Label
 Var Ana_RegisterSystemPython_Label
 
@@ -62,16 +68,38 @@ Function mui_CustomShortcuts_Show
     ${NSD_CreateCheckbox} 20u 30u 250u 10u \
         "Create shortcuts for ${NAME} in the Start Menu"
     Pop $CreateStartMenuShortcuts
+    ${NSD_SetState} $CreateStartMenuShortcuts $CreateStartMenuShortcuts_State
+    ${NSD_OnClick} $CreateStartMenuShortcuts CreateStartMenuShortcuts_OnClick
 
     ${NSD_CreateCheckbox} 20u 60u 250u 10u \
         "Create shortcuts for ${NAME} on the Desktop"
     Pop $CreateDesktopShortcuts
+    ${NSD_SetState} $CreateDesktopShortcuts $CreateDesktopShortcuts_State
+    ${NSD_OnClick} $CreateDesktopShortcuts CreateDesktopShortcuts_OnClick
 
-    ${NSD_CreateCheckbox} 20u 90u 250u 10u \
-        "Add an option $\"Open ${NAME} Prompt here$\" to the right-click menu in Windows Explorer"
+    ${NSD_CreateCheckbox} 20u 90u 250u 30u \
+        "Add an option $\"Open ${NAME} Prompt here$\" to the right-click menu in Windows Explorer (you must install this as Administrator)"
     Pop $RegisterShell
+    EnableWindow $RegisterShell $InstMode
+    ${NSD_SetState} $RegisterShell $RegisterShell_State
+    ${NSD_OnClick} $RegisterShell RegisterShell_OnClick
 
     nsDialogs::Show
+FunctionEnd
+
+Function CreateStartMenuShortcuts_OnClick
+    Pop $0
+    ${NSD_GetState} $0 $CreateStartMenuShortcuts_State
+FunctionEnd
+
+Function CreateDesktopShortcuts_OnClick
+    Pop $0
+    ${NSD_GetState} $0 $CreateDesktopShortcuts_State
+FunctionEnd
+
+Function RegisterShell_OnClick
+    Pop $0
+    ${NSD_GetState} $0 $RegisterShell_State
 FunctionEnd
 
 Function mui_AnaCustomOptions_Show
