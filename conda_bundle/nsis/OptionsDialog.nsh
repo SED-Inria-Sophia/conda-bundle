@@ -80,8 +80,13 @@ Function mui_CustomShortcuts_Show
     ${NSD_CreateCheckbox} 20u 90u 250u 30u \
         "Add an option $\"Open ${NAME} Prompt here$\" to the right-click menu in Windows Explorer (you must install this as Administrator)"
     Pop $RegisterShell
-    EnableWindow $RegisterShell $InstMode
-    ${NSD_SetState} $RegisterShell $RegisterShell_State
+        ${If} ${UAC_IsAdmin}
+        EnableWindow $RegisterShell 1
+        ${NSD_SetState} $RegisterShell $RegisterShell_State
+    ${Else}
+        EnableWindow $RegisterShell 0
+        ${NSD_SetState} $RegisterShell 0
+    ${EndIf}
     ${NSD_OnClick} $RegisterShell RegisterShell_OnClick
 
     nsDialogs::Show
