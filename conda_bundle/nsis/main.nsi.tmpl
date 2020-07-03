@@ -64,6 +64,12 @@ var /global InstModePage_RadioButton_JustMe
 var /global InstModePage_RadioButton_AllUsers
 
 var /global InstMode # 0 = Just Me, 1 = All Users.
+
+#State for the checkboxes
+Var /GLOBAL CreateStartMenuShortcuts_State
+Var /GLOBAL CreateDesktopShortcuts_State
+Var /GLOBAL RegisterShell_State
+
 !define JUST_ME 0
 !define ALL_USERS 1
 
@@ -117,6 +123,7 @@ Page Custom InstModePage_Create InstModePage_Leave
 !insertmacro MUI_PAGE_DIRECTORY
 # Custom options now differ depending on installation mode.
 # Page Custom mui_AnaCustomOptions_Show ;Used to register conda to path, disabled in our case.
+Page Custom mui_CustomShortcuts_Show
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -524,6 +531,10 @@ Function .onInit
     StrCpy $Ana_RegisterSystemPython_State ${BST_UNCHECKED}
 #endif
 
+    StrCpy $CreateStartMenuShortcuts_State ${BST_CHECKED}
+    StrCpy $CreateDesktopShortcuts_State ${BST_CHECKED}
+    StrCpy $RegisterShell_State ${BST_UNCHECKED}
+
     Call OnInit_Release
 
     Pop $R2
@@ -819,15 +830,31 @@ Section "Install"
     SetOutPath "$INSTDIR\conda-meta"
     File __CONDA_HISTORY__
 
-    DetailPrint "Creating @NAME@ menus..."
+${If} $CreateStartMenuShortcuts_State == ${BST_CHECKED}
+    DetailPrint "Creating @NAME@ Start Menu shortcuts..."
 
     # TODO: replace with keys
     # CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
     # CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
     CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
     @START_MENU_CREATE_SHORTCUT_EXE@
-    @DESKTOP_CREATE_SHORTCUT_EXE@
+${EndIf}
 
+${If} $CreateDesktopShortcuts_State == ${BST_CHECKED}
+    DetailPrint "Creating @NAME@ Desktop shortcuts..."
+    @DESKTOP_CREATE_SHORTCUT_EXE@
+${EndIf}
+
+${If} $RegisterShell_State == ${BST_CHECKED}
+    DetailPrint "Registering @NAME@ Prompt in Windows Explorer..."
+
+    WriteRegStr HKCR "Directory\Background\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr HKCR "Directory\Background\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+    WriteRegStr HKCR "Directory\Background\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
+    WriteRegStr HKCR "Directory\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr HKCR "Directory\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+    WriteRegStr HKCR "Directory\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
+${EndIf}
 /*
     push '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\Lib\_nsis.py" mkdirs'
     push 'Failed to initialize Anaconda directories'
@@ -873,10 +900,20 @@ Section "Uninstall"
     # TODO: replace with keys
     # Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
     # Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
+
+# ${If} $CreateStartMenuShortcuts == ${BST_CHECKED}
     @START_MENU_DELETE_SHORTCUT_EXE@
+# ${EndIf}
+
+# ${If} $CreateDesktopShortcuts == ${BST_CHECKED}
     @DESKTOP_DELETE_SHORTCUT_EXE@
     RMDir "$SMPROGRAMS\${PRODUCT_NAME}"
+# ${EndIf}
 
+# ${If} $RegisterShell == ${BST_CHECKED}
+    DeleteRegKey HKCR "Directory\Background\shell\${NAME}"
+    DeleteRegKey HKCR "Directory\shell\${NAME}"
+# ${EndIf}
     # ensure that MSVC runtime DLLs are on PATH during uninstallation
     ReadEnvStr $0 PATH
     # set PATH for the installer process, so that MSVC runtimes get found OK
