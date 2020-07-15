@@ -116,7 +116,8 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
             if any((not s) for s in info[key]):
                 sys.exit("Error: found empty element in '%s:'" % key)
 
-    print(info)
+    import json
+    print(json.dumps(info, indent = 4))
 
     # moved dry run above fcp
     fcp_main(info, verbose=verbose, dry_run=dry_run)

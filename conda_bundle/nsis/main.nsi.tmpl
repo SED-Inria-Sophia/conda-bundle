@@ -42,6 +42,8 @@ Unicode "true"
 # !define EXE_NAME "${NAME}.exe" 
 # WARNING: I'M MAKING A HUGE ASSUMPTION THAT MY EXE IS CALLED NAME.EXE
 
+!define ALLOW_REGISTER_SHELL __ALLOW_REGISTER_SHELL__
+
 var /global INSTDIR_JUSTME
 
 !define INSTDIR_ALLUSERS "$%ALLUSERSPROFILE%\${NAME}"
@@ -111,6 +113,9 @@ BrandingText /TRIMLEFT "${COMPANY}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP __WELCOMEIMAGE__
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP __WELCOMEIMAGE__
 #!define MUI_CUSTOMFUNCTION_GUIINIT GuiInit
+
+!define MUI_FINISHPAGE_LINK __FINISH_LINK_TEXT__
+!define MUI_FINISHPAGE_LINK_LOCATION __FINISH_LINK_URL__
 
 # Pages
 #!define MUI_PAGE_CUSTOMFUNCTION_SHOW OnStartup
@@ -534,7 +539,7 @@ Function .onInit
 
     StrCpy $CreateStartMenuShortcuts_State ${BST_CHECKED}
     StrCpy $CreateDesktopShortcuts_State ${BST_CHECKED}
-    StrCpy $RegisterShell_State ${BST_UNCHECKED}
+    StrCpy $RegisterShell_State ${BST_CHECKED}
 
     Call OnInit_Release
 
