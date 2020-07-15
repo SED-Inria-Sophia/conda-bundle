@@ -77,17 +77,13 @@ Function mui_CustomShortcuts_Show
     ${NSD_SetState} $CreateDesktopShortcuts $CreateDesktopShortcuts_State
     ${NSD_OnClick} $CreateDesktopShortcuts CreateDesktopShortcuts_OnClick
 
-    ${NSD_CreateCheckbox} 20u 90u 250u 30u \
-        "Add an option $\"Open ${NAME} Prompt here$\" to the right-click menu in Windows Explorer (you must install this as Administrator)"
-    Pop $RegisterShell
-        ${If} ${UAC_IsAdmin}
-        EnableWindow $RegisterShell 1
+    ${If} ${ALLOW_REGISTER_SHELL} == "True"
+        ${NSD_CreateCheckbox} 20u 90u 250u 30u \
+            "Add an option $\"Open ${NAME} Prompt here$\" to the context menu in Windows Explorer"
+        Pop $RegisterShell
         ${NSD_SetState} $RegisterShell $RegisterShell_State
-    ${Else}
-        EnableWindow $RegisterShell 0
-        ${NSD_SetState} $RegisterShell 0
+        ${NSD_OnClick} $RegisterShell RegisterShell_OnClick
     ${EndIf}
-    ${NSD_OnClick} $RegisterShell RegisterShell_OnClick
 
     nsDialogs::Show
 FunctionEnd

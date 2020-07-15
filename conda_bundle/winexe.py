@@ -113,7 +113,6 @@ def make_nsi(info, dir_path):
         start_menu_delete_commands = start_menu_delete_commands + 'Delete "$SMPROGRAMS\\${PRODUCT_NAME}' + f'\\{t["name"]}.lnk"\n'
         desktop_delete_commands = desktop_delete_commands + f'Delete "$DESKTOP\\{t["name"]}.lnk"\n'
 
-
     # these appear as __<key>__ in the template, and get escaped
     replace = {
         'NAME': name,
@@ -133,6 +132,16 @@ def make_nsi(info, dir_path):
         ),
         'POST_INSTALL_DESC': info['post_install_desc'],
     }
+
+    if 'finish_link' in info.keys():
+        replace['FINISH_LINK_URL'] = info['finish_link']['url']
+        replace['FINISH_LINK_TEXT'] = info['finish_link']['text']
+
+    if 'win_register_shell' in info.keys():
+        replace['ALLOW_REGISTER_SHELL'] = f"{info['win_register_shell']}"
+    else:
+        replace['ALLOW_REGISTER_SHELL'] = "False"
+
     for key, fn in [('HEADERIMAGE', 'header.bmp'),
                     ('WELCOMEIMAGE', 'welcome.bmp'),
                     ('ICONFILE', 'icon.ico'),

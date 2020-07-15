@@ -38,8 +38,11 @@ Unicode "true"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKCU"
 !define MUI_LANGDLL_REGISTRY_ROOT "HKCU"
+!define PRODUCT_REGISTER_KEY "HKCU" ; this will register the program for the user. it can be changed to HKLM to register for all users.
 # !define EXE_NAME "${NAME}.exe" 
 # WARNING: I'M MAKING A HUGE ASSUMPTION THAT MY EXE IS CALLED NAME.EXE
+
+!define ALLOW_REGISTER_SHELL __ALLOW_REGISTER_SHELL__
 
 var /global INSTDIR_JUSTME
 
@@ -110,6 +113,9 @@ BrandingText /TRIMLEFT "${COMPANY}"
 !define MUI_WELCOMEFINISHPAGE_BITMAP __WELCOMEIMAGE__
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP __WELCOMEIMAGE__
 #!define MUI_CUSTOMFUNCTION_GUIINIT GuiInit
+
+!define MUI_FINISHPAGE_LINK __FINISH_LINK_TEXT__
+!define MUI_FINISHPAGE_LINK_LOCATION __FINISH_LINK_URL__
 
 # Pages
 #!define MUI_PAGE_CUSTOMFUNCTION_SHOW OnStartup
@@ -533,7 +539,7 @@ Function .onInit
 
     StrCpy $CreateStartMenuShortcuts_State ${BST_CHECKED}
     StrCpy $CreateDesktopShortcuts_State ${BST_CHECKED}
-    StrCpy $RegisterShell_State ${BST_UNCHECKED}
+    StrCpy $RegisterShell_State ${BST_CHECKED}
 
     Call OnInit_Release
 
@@ -848,12 +854,12 @@ ${EndIf}
 ${If} $RegisterShell_State == ${BST_CHECKED}
     DetailPrint "Registering @NAME@ Prompt in Windows Explorer..."
 
-    WriteRegStr HKCR "Directory\Background\shell\${NAME}" "" "Open ${NAME} Prompt here"
-    WriteRegStr HKCR "Directory\Background\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
-    WriteRegStr HKCR "Directory\Background\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
-    WriteRegStr HKCR "Directory\shell\${NAME}" "" "Open ${NAME} Prompt here"
-    WriteRegStr HKCR "Directory\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
-    WriteRegStr HKCR "Directory\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\Background\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\Background\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\Background\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}" "" "Open ${NAME} Prompt here"
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
+    WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
 ${EndIf}
 /*
     push '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\Lib\_nsis.py" mkdirs'
@@ -911,8 +917,8 @@ Section "Uninstall"
 # ${EndIf}
 
 # ${If} $RegisterShell == ${BST_CHECKED}
-    DeleteRegKey HKCR "Directory\Background\shell\${NAME}"
-    DeleteRegKey HKCR "Directory\shell\${NAME}"
+    DeleteRegKey ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\Background\shell\${NAME}"
+    DeleteRegKey ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}"
 # ${EndIf}
     # ensure that MSVC runtime DLLs are on PATH during uninstallation
     ReadEnvStr $0 PATH

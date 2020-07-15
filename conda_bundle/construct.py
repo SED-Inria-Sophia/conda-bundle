@@ -215,7 +215,17 @@ interactive installation. (Windows only)
     for macOS usually bin/myapp.app/Contents/MacOS/myapp
     for Windows usually Library/bin/myapp.exe
     it's a list, so you can specify multiple of them to create multiple shortcuts on Windows.
- ''')
+ '''),
+
+    ('finish_link',  False, dict, '''
+a the link to display at the end of the installer (for Windows) (yeah there can be only one.)
+    url: the url
+    text: the text to be displayed
+ '''),
+
+    ('win_register_shell', False, bool, '''
+whether or not to let the user to register its shell to open the embedded Conda console in any folder of the Windows Explorer.
+    ''')
 ]
 
 
