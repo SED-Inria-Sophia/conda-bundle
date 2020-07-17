@@ -308,6 +308,7 @@ argument type(s): ``str``,
 If `header_image` is not provided, use this text when generating the image
 (Windows only). Defaults to `name`.
 
+<!-- >
 ## `initialize_by_default`
 
 required: False
@@ -327,7 +328,62 @@ argument type(s): ``bool``,
 Default choice for whether to register the installed Python instance as the
 system's default Python. The user is still able to change this during
 interactive installation. (Windows only)
+-->
 
+## `shortcuts`
+
+required: True (on Windows)
+
+argument types(s): ``dict``
+
+
+This lets you define shortcuts to be created on Windows. assuming the install folder is __INSTALL_PATH__:
+- for Linux usually bin/myapp
+- for macOS usually bin/myapp.app/Contents/MacOS/myapp
+- for Windows usually Library/bin/myapp.exe
+
+the dictionary has 4 fields: `name, path, options, icon`. `name` and `path` are mandatory. `options` and `icons` are facultative.
+
+Example:
+
+```yaml
+shortcuts:
+  the_app_shortcut:
+    name: "MyProgram"
+    path: "__INSTALL_PATH__\\Library\\bin\\myProgram.exe"
+    options: ""
+    icon: "$WINDIR\\System32\\Bubbles.scr" # You can put something like this: "__INSTALL_PATH__\\Menu\\app.ico"
+  the_conda_console_shortcut:
+    name: "MyProgram Prompt"
+    path: "$WINDIR\\System32\\cmd.exe"
+    options: "$\\\"/K$\\\" __INSTALL_PATH__\\Scripts\\activate.bat __INSTALL_PATH__"
+```
+Note: key names like `the_app_shortcut` or `the_conda_console_shortcut` are irrelevant, they could be named however you like, even `0, 1, 2`...
+
+## `finish_link`
+
+required: False
+
+argument types(s): ``dict``, with keys `url, text`
+
+A link to display at the end of the installer (for Windows) (there can be only one.)
+    url: the url
+    text: the text to be displayed
+
+Example:
+```yaml
+finish_link:
+    url: "https://team.gitlabpages.mycompany.fr/myproject/"
+    text: "Open the project website"
+```
+
+## `win_register_shell`
+
+required: False
+
+argument types(s): ``bool``
+
+whether or not to let the user to register its shell. This adds a shortcut to the right-click menu in Windows Explorer so that you can open the local Conda prompt of the project in any folder on Windows. It comes in handy if your program has many command-line tools.
 
 ## List of available selectors:
 
