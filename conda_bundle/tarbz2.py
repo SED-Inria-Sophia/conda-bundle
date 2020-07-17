@@ -59,17 +59,28 @@ def create(info, verbose=False):
     python_api.run_command('install', arg_info_channels)
     print("Installation done.")
 
-    replace = {
+    for t in info['shortcuts'].values():
+        #for key in 'path', 'icon', 'options':
+        #    if key in t:
+        #        t[key] = t[key].replace("__INSTALL_PATH__", "./")
+        options = ""
+        icon = t['path']
+        if 'options' in t:
+            options = t['options']
+        if 'icon' in t:
+            icon = t["icon"]
+
+        replace = {
         'NAME': info['name'],
         'name': info['name'].lower(),
         'VERSION': info['version'],
-        'ENTRY_POINT': info['entry_point']
-    }
-    data = read_launch_template()
-    data = fill_template(data, replace)
-    with open(join(tmp_dir, 'launch.sh'), 'wb') as fo:
-        fo.write(data.encode('utf-8'))
-    os.chmod(join(tmp_dir, 'launch.sh'), stat.S_IRWXU + stat.S_IRGRP + stat.S_IROTH)
+        'ENTRY_POINT': f"{t['path']} {options}"
+        }
+        data = read_launch_template()
+        data = fill_template(data, replace)
+        with open(join(tmp_dir, f"{t['name']}.sh"), 'wb') as fo:
+            fo.write(data.encode('utf-8'))
+        os.chmod(join(tmp_dir, f"{t['name']}.sh"), stat.S_IRWXU + stat.S_IRGRP + stat.S_IROTH)
 
     # 3) pack the whole thing
     archive_format = 'tar.bz2'
@@ -85,4 +96,3 @@ def create(info, verbose=False):
     # os.chmod(shar_path, 0o755)
     print("Packing done. Removing temporary dir.")
     shutil.rmtree(tmp_dir)
-

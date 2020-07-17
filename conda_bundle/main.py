@@ -90,8 +90,8 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
             sys.exit("Error: Can only create .exe installer on Windows.")
         from .winexe import create
     if info['installer_type'] == 'tar.bz2':
-        if sys.platform == 'win32':
-            sys.exit("Error: Cannot create .tar.bz2 package on Windows.")
+        if sys.platform == 'win32' or sys.platform == 'darwin':
+            sys.exit("Error: Cannot create .tar.bz2 package on Windows nor macOS.")
         from .tarbz2 import create
 
     if verbose:
