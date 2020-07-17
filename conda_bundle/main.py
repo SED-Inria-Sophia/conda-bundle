@@ -120,12 +120,17 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
             if any((not s) for s in info[key]):
                 sys.exit("Error: found empty element in '%s:'" % key)
 
+    import json
+    print(json.dumps(info, indent = 4))
+
+    # moved dry run above fcp
     fcp_main(info, verbose=verbose, dry_run=dry_run)
+
     if dry_run:
         print(info)
         print("Dry run, no installer created.")
         return
-
+    
     info['_outpath'] = abspath(join(output_dir, get_output_filename(info)))
 
     # info has keys
@@ -143,7 +148,6 @@ def main_build(dir_path, output_dir='.', platform=cc_platform,
             for dist in info['_dists']:
                 fo.write('%s\n' % dist)
     print("Successfully created '%(_outpath)s'." % info)
-
 
 def main():
     import argparse
