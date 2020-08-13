@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Type=Application
+Exec=__INSTALL_PATH__/__ENTRY_POINT__ %u
+Icon=__INSTALL_PATH__/__ICON__
+Terminal=__IS_OPENING_TERMINAL__
+Name=__NAME__
+GenericName=__NAME__
+Categories=Science, Mathematics, Visualization

@@ -46,7 +46,7 @@ def get_header(conda_exec, tarball, info):
         'VERSION': info['version'],
         'PLAT': info['_platform'],
         'DEFAULT_PREFIX': info.get('default_prefix',
-                                   '$HOME/bin/%s' % name.lower()),
+                                   f"$HOME/bin/{name.lower()}"),
         'MD5': md5_files([conda_exec, tarball]),
         'INSTALL_COMMANDS': '\n'.join(install_lines),
         'pycache': '__pycache__',
