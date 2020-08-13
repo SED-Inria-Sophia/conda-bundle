@@ -80,7 +80,8 @@ def create(info, verbose=False):
         data = fill_template(data, replace)
         with open(join(tmp_dir, f"{t['name']}.sh"), 'wb') as fo:
             fo.write(data.encode('utf-8'))
-        os.chmod(join(tmp_dir, f"{t['name']}.sh"), stat.S_IRWXU + stat.S_IRGRP + stat.S_IROTH)
+        os.chmod(join(tmp_dir, f"{t['name']}.sh"), 0o755)
+    
 
     # 3) pack the whole thing
     archive_format = 'tar.bz2'
