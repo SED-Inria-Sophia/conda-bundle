@@ -30,7 +30,8 @@ cp "$PREFIX/conda-meta/history.bak" "$PREFIX/conda-meta/history"
 rm -f "$CONDA_EXEC"
 rm -f "$PREFIX/pkgs/env.txt"
 
-__WRITE_CONDARC__
+
+# ==WRITE_CONDARC== ## Remove environment-specific conda files, replaced __ with == to avoid macro expansion
 
 "$PREFIX/bin/python" -V
 if (( $? )); then

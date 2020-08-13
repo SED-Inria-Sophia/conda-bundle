@@ -244,9 +244,9 @@ def create(info, verbose=False):
 
     # Next, the script to edit bashrc with the PATH.  This is separate so it
     # can be disabled.
-    pkgbuild_script('pathupdate', info, 'update_path.sh')
+    ## pkgbuild_script('pathupdate', info, 'update_path.sh') ## NOTE: I disabled this.
 
-    post_packages = ['postextract', 'pathupdate']
+    post_packages = ['postextract'] #, 'pathupdate'
 
     # Next, the users post_install script, if specified
     if info.get('post_install', None) is not None:

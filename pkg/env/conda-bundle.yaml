@@ -1,0 +1,24 @@
+# Version: $Id$
+#
+#
+
+# Commentary:
+#
+#
+
+# Change Log:
+#
+#
+
+# Code:
+
+name: conda-bundle
+channels:
+  - jolevy
+dependencies:
+  - python = 3.7.6
+  - conda-pack >= 0.5.0
+
+#
+# conda-bundle.yaml ends here
+

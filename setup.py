@@ -25,8 +25,8 @@ SETUP_PY_DIR = dirname(abspath(__file__))
 def get_package_data(platform):
     platform_package_data = {
         "win32": ["nsis/*", "ttf/*"],
-        "darwin": ["header.sh", "osx/*"],
-        "unix": ["header.sh"],
+        "darwin": ["header.sh", "launch.sh", "osx/*"],
+        "unix": ["header.sh", "launch.sh"],
     }
     if platform is None:
         package_data = sum(platform_package_data.values(), [])

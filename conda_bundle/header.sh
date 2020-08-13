@@ -60,7 +60,12 @@ fi
 THIS_DIR=$(DIRNAME=$(dirname "$0"); cd "$DIRNAME"; pwd)
 THIS_FILE=$(basename "$0")
 THIS_PATH="$THIS_DIR/$THIS_FILE"
-PREFIX=__DEFAULT_PREFIX__
+#if osx
+PREFIX="/Applications"
+#else
+RAW_PREFIX=__DEFAULT_PREFIX__
+PREFIX="$RAW_PREFIX/__NAME__"
+#endif
 BATCH=0
 FORCE=0
 SKIP_SCRIPTS=0
@@ -163,6 +168,10 @@ else
         esac
     done
 fi
+
+####################################
+##### BEGIN : INTERACTIVE MODE #####
+####################################
 
 if [ "$BATCH" = "0" ] # interactive mode
 then
@@ -332,6 +341,14 @@ if ! mkdir -p "$PREFIX"; then
     exit 1
 fi
 
+#if osx
+mkdir  "$PREFIX/__NAME__.app"
+mkdir  "$PREFIX/__NAME__.app/Contents"
+mkdir  "$PREFIX/__NAME__.app/Contents/MacOS"
+mkdir  "$PREFIX/__NAME__.app/Contents/Resources"
+PREFIX="$PREFIX/__NAME__.app/Contents/Resources"
+#endif
+
 PREFIX=$(cd "$PREFIX"; pwd)
 export PREFIX
 
@@ -377,12 +394,12 @@ printf "Unpacking payload ...\n"
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_OFFSET_BYTES@ count=@TARBALL_START_REMAINDER@ 2>/dev/null
     dd if="$THIS_PATH" bs=@BLOCK_SIZE@ skip=@TARBALL_BLOCK_OFFSET@ count=@TARBALL_SIZE_BLOCKS@ 2>/dev/null
     dd if="$THIS_PATH" bs=1 skip=@TARBALL_REMAINDER_OFFSET@ count=@TARBALL_END_REMAINDER@ 2>/dev/null
-} | "$CONDA_EXEC" bundle --extract-tar --prefix "$PREFIX"
+} | "$CONDA_EXEC" constructor --extract-tar --prefix "$PREFIX"
 
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-conda-pkgs || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-conda-pkgs || exit 1
 
 PRECONDA="$PREFIX/preconda.tar.bz2"
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$PRECONDA" || exit 1
 rm -f "$PRECONDA"
 
 #if has_pre_install
@@ -407,7 +424,7 @@ export FORCE
 # https://github.com/ContinuumIO/anaconda-issues/issues/11148
 # First try to fix it (this apparently didn't work; QA reported the issue again)
 # https://github.com/conda/conda/pull/9073
-mkdir -p ~/.conda > /dev/null 2>&1
+## mkdir -p ~/.conda > /dev/null 2>&1 ## NOTE: removing side-effects on user files
 
 CONDA_SAFETY_CHECKS=disabled \
 CONDA_EXTRA_SAFETY_CHECKS=no \
@@ -416,14 +433,15 @@ CONDA_PKGS_DIRS="$PREFIX/pkgs" \
 "$CONDA_EXEC" install --offline --file "$PREFIX/pkgs/env.txt" -yp "$PREFIX" || exit 1
 
 #if not keep_pkgs
+    printf "Removing pkgs... "
     rm -fr $PREFIX/pkgs/*.tar.bz2
     rm -fr $PREFIX/pkgs/*.conda
 #endif
 
-__INSTALL_COMMANDS__
+## ==INSTALL_COMMANDS== ## NOTE: replaced __ with == to avoid macro expansion - I don't know what this does!
 
 POSTCONDA="$PREFIX/postconda.tar.bz2"
-"$CONDA_EXEC" bundle --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
+"$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
 rm -f "$POSTCONDA"
 
 rm -f $PREFIX/conda.exe
@@ -432,12 +450,13 @@ rm -f $PREFIX/pkgs/env.txt
 rm -rf $PREFIX/install_tmp
 export TMP="$TMP_BACKUP"
 
-mkdir -p $PREFIX/envs
+# mkdir -p $PREFIX/envs
 
 #if has_post_install
 if [ "$SKIP_SCRIPTS" = "1" ]; then
     printf "WARNING: skipping post_install.sh by user request\\n" >&2
 else
+    printf "Running post-install... "
     if ! $RUNNING_SHELL "$PREFIX/pkgs/post_install.sh"; then
         printf "ERROR: executing post_install.sh failed\\n" >&2
         exit 1
@@ -453,69 +472,75 @@ rm -f "$MSGS"
 rm -rf "$PREFIX"/pkgs
 #endif
 
+#if osx
+cp "$PREFIX/misc/macOS/Info.plist" "$PREFIX/../"
+cp "$PREFIX/misc/macOS/__NAME__" "$PREFIX/../MacOS/"
+#endif
+
 printf "installation finished.\\n"
 
-if [ "$PYTHONPATH" != "" ]; then
-    printf "WARNING:\\n"
-    printf "    You currently have a PYTHONPATH environment variable set. This may cause\\n"
-    printf "    unexpected behavior when running the Python interpreter in __NAME__.\\n"
-    printf "    For best results, please verify that your PYTHONPATH only points to\\n"
-    printf "    directories of packages that are compatible with the Python interpreter\\n"
-    printf "    in __NAME__: $PREFIX\\n"
-fi
+        # if [ "$PYTHONPATH" != "" ]; then
+        #     printf "WARNING:\\n"
+        #     printf "    You currently have a PYTHONPATH environment variable set. This may cause\\n"
+        #     printf "    unexpected behavior when running the Python interpreter in __NAME__.\\n"
+        #     printf "    For best results, please verify that your PYTHONPATH only points to\\n"
+        #     printf "    directories of packages that are compatible with the Python interpreter\\n"
+        #     printf "    in __NAME__: $PREFIX\\n"
+        # fi
 
-if [ "$BATCH" = "0" ]; then
-    # Interactive mode.
-#if osx
-    BASH_RC="$HOME"/.bash_profile
-    DEFAULT=yes
-#else
-    BASH_RC="$HOME"/.bashrc
-    DEFAULT=no
-#endif
-#if initialize_by_default is True
-    DEFAULT=yes
-#endif
-#if initialize_by_default is False
-    DEFAULT=no
-#endif
+        # if [ "$BATCH" = "0" ]; then
+        #     # Interactive mode.
+        # #if osx
+        #     BASH_RC="$HOME"/.bash_profile
+        #     DEFAULT=yes
+        # #else
+        #     BASH_RC="$HOME"/.bashrc
+        #     DEFAULT=no
+        # #endif
+        # #if initialize_by_default is True
+        #     DEFAULT=yes
+        # #endif
+        # #if initialize_by_default is False
+        #     DEFAULT=no
+        # #endif
 
-    printf "Do you wish the installer to initialize __NAME__\\n"
-    printf "by running conda init? [yes|no]\\n"
-    printf "[%s] >>> " "$DEFAULT"
-    read -r ans
-    if [ "$ans" = "" ]; then
-        ans=$DEFAULT
-    fi
-    if [ "$ans" != "yes" ] && [ "$ans" != "Yes" ] && [ "$ans" != "YES" ] && \
-       [ "$ans" != "y" ]   && [ "$ans" != "Y" ]
-    then
-        printf "\\n"
-        printf "You have chosen to not have conda modify your shell scripts at all.\\n"
-        printf "To activate conda's base environment in your current shell session:\\n"
-        printf "\\n"
-        printf "eval \"\$($PREFIX/bin/conda shell.YOUR_SHELL_NAME hook)\" \\n"
-        printf "\\n"
-        printf "To install conda's shell functions for easier access, first activate, then:\\n"
-        printf "\\n"
-        printf "conda init\\n"
-        printf "\\n"
-    else
-        if [[ $SHELL = *zsh ]]
-        then
-            $PREFIX/bin/conda init zsh
-        else
-            $PREFIX/bin/conda init
-        fi
-    fi
-    printf "If you'd prefer that conda's base environment not be activated on startup, \\n"
-    printf "   set the auto_activate_base parameter to false: \\n"
-    printf "\\n"
-    printf "conda config --set auto_activate_base false\\n"
-    printf "\\n"
+        # printf "Do you wish the installer to initialize __NAME__\\n"
+        # printf "by running conda init? [yes|no]\\n"
+        # printf "[%s] >>> " "$DEFAULT"
+        # read -r ans
+        # if [ "$ans" = "" ]; then
+        #     ans=$DEFAULT
+        # fi
+        # if [ "$ans" != "yes" ] && [ "$ans" != "Yes" ] && [ "$ans" != "YES" ] && \
+        # [ "$ans" != "y" ]   && [ "$ans" != "Y" ]
+        # then
+        #     printf "\\n"
+        #     printf "You have chosen to not have conda modify your shell scripts at all.\\n"
+        #     printf "To activate conda's base environment in your current shell session:\\n"
+        #     printf "\\n"
+        #     printf "eval \"\$($PREFIX/bin/conda shell.YOUR_SHELL_NAME hook)\" \\n"
+        #     printf "\\n"
+        #     printf "To install conda's shell functions for easier access, first activate, then:\\n"
+        #     printf "\\n"
+        #     printf "conda init\\n"
+        #     printf "\\n"
+        # else
+        #     if [[ $SHELL = *zsh ]]
+        #     then
+        #         $PREFIX/bin/conda init zsh
+        #     else
+        #         $PREFIX/bin/conda init
+        #     fi
+        # fi
+        # printf "If you'd prefer that conda's base environment not be activated on startup, \\n"
+        # printf "   set the auto_activate_base parameter to false: \\n"
+        # printf "\\n"
+        # printf "conda config --set auto_activate_base false\\n"
+        # printf "\\n"
 
-    printf "Thank you for installing __NAME__!\\n"
-fi # !BATCH
+        printf "Thank you for installing __NAME__!\\n"
+
+# fi # !BATCH
 
 if [ "$TEST" = "1" ]; then
     printf "INFO: Running package tests in a subshell\\n"
