@@ -341,6 +341,19 @@ if ! mkdir -p "$PREFIX"; then
     exit 1
 fi
 
+create_shortcuts=true
+#if linux
+printf "\\nThis installer can create shortcuts in your start menu."
+printf "\\nDo you want shortcuts in your start menu to run __NAME__? [yes|no]"
+printf "\\n[yes] >>> "
+read -r ans
+if [ "$ans" == "no" ] || [ "$ans" == "No" ] || [ "$ans" == "NO" ] && \
+    [ "$ans" == "n" ]   || [ "$ans" == "N" ]
+then
+    create_shortcuts=false
+fi
+#endif
+
 #if osx
 mkdir  "$PREFIX/__NAME__.app"
 mkdir  "$PREFIX/__NAME__.app/Contents"
@@ -443,8 +456,12 @@ POSTCONDA="$PREFIX/postconda.tar.bz2"
 rm -f "$POSTCONDA"
 
 #if linux
+if $create_shortcuts
+then
     sed -i "s%@@INSTALL_PATH@@%$PREFIX%g" *.desktop
     mv -f *.desktop $HOME/.local/share/applications/
+    printf "\\nShortcuts created.\\n"
+fi
 #endif
 
 rm -f $PREFIX/conda.exe
@@ -490,8 +507,12 @@ printf "installation finished.\\n"
         #     printf "    directories of packages that are compatible with the Python interpreter\\n"
         #     printf "    in __NAME__: $PREFIX\\n"
         # fi
-
+        if __IS_FINISH_LINK__
+        then
+        printf "\\n__FINISH_LINK_TEXT__\\n__FINISH_LINK_URL__\\n\\n"
+        fi
         printf "Thank you for installing __NAME__!\\n"
+
 
 # fi # !BATCH
 

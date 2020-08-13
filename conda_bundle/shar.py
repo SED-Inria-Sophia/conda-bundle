@@ -40,6 +40,13 @@ def get_header(conda_exec, tarball, info):
     ppd['initialize_by_default'] = info.get('initialize_by_default', None)
     install_lines = list(add_condarc(info))
     # Needs to happen first -- can be templated
+    is_finish_link = False
+    finish_link_text = ""
+    finish_link_url = ""
+    if 'finish_link' in info:
+        is_finish_link = True
+        finish_link_text = info['finish_link']['text']
+        finish_link_url = info['finish_link']['url']
     replace = {
         'NAME': name,
         'name': name.lower(),
@@ -49,6 +56,9 @@ def get_header(conda_exec, tarball, info):
                                    f"$HOME/bin/{name.lower()}"),
         'MD5': md5_files([conda_exec, tarball]),
         'INSTALL_COMMANDS': '\n'.join(install_lines),
+        'IS_FINISH_LINK': f"{is_finish_link}".lower(),
+        'FINISH_LINK_TEXT': finish_link_text,
+        'FINISH_LINK_URL': finish_link_url,
         'pycache': '__pycache__',
     }
     if has_license:
