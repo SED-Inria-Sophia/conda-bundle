@@ -40,15 +40,25 @@ def get_header(conda_exec, tarball, info):
     ppd['initialize_by_default'] = info.get('initialize_by_default', None)
     install_lines = list(add_condarc(info))
     # Needs to happen first -- can be templated
+    is_finish_link = False
+    finish_link_text = ""
+    finish_link_url = ""
+    if 'finish_link' in info:
+        is_finish_link = True
+        finish_link_text = info['finish_link']['text']
+        finish_link_url = info['finish_link']['url']
     replace = {
         'NAME': name,
         'name': name.lower(),
         'VERSION': info['version'],
         'PLAT': info['_platform'],
         'DEFAULT_PREFIX': info.get('default_prefix',
-                                   '$HOME/bin/%s' % name.lower()),
+                                   f"$HOME/bin/{name.lower()}"),
         'MD5': md5_files([conda_exec, tarball]),
         'INSTALL_COMMANDS': '\n'.join(install_lines),
+        'IS_FINISH_LINK': f"{is_finish_link}".lower(),
+        'FINISH_LINK_TEXT': finish_link_text,
+        'FINISH_LINK_URL': finish_link_url,
         'pycache': '__pycache__',
     }
     if has_license:
@@ -106,6 +116,11 @@ def get_header(conda_exec, tarball, info):
 
     return data
 
+def read_desktop_template():
+    path = join(THIS_DIR, 'template.desktop')
+    print('Reading: %s' % path)
+    with open(path) as fi:
+        return fi.read()
 
 def create(info, verbose=False):
     tmp_dir_base_path = join(dirname(info['_outpath']), "tmp")
@@ -149,6 +164,41 @@ def create(info, verbose=False):
     t = tarfile.open(tarball, 'w')
     t.add(preconda_tarball, basename(preconda_tarball))
     t.add(postconda_tarball, basename(postconda_tarball))
+
+
+
+    for i in info['shortcuts'].values():
+        #for key in 'path', 'icon', 'options':
+        #    if key in t:
+        #        t[key] = t[key].replace("__INSTALL_PATH__", "./")
+        options = ""
+        icon = i['path']
+        terminal = False
+        if 'options' in i:
+            options = i['options']
+        if 'icon' in i:
+            icon = i["icon"]
+        else:
+            icon = "default.png"
+            if not icon in t.getnames():
+                t.add(join(THIS_DIR, icon), basename(join(THIS_DIR, icon)))
+        if 'terminal' in i:
+            terminal = i["terminal"]
+
+        replace = {
+        'NAME': i['name'],
+        'name': i['name'].lower(),
+        'ENTRY_POINT': f"{i['path']} {options}",
+        'ICON': f"{icon}",
+        'TERMINAL': f"{terminal}"
+        }
+        data = read_desktop_template()
+        data = fill_template(data, replace)
+        with open(join(tmp_dir, f"{i['name']}.desktop"), 'wb') as fo:
+            fo.write(data.encode('utf-8'))
+        os.chmod(join(tmp_dir, f"{i['name']}.desktop"), 0o755)
+        t.add(join(tmp_dir, f"{i['name']}.desktop"), basename(join(tmp_dir, f"{i['name']}.desktop")))
+
     if 'license_file' in info:
         t.add(info['license_file'], 'LICENSE.txt')
     for dist in info['_dists']:

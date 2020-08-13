@@ -341,6 +341,19 @@ if ! mkdir -p "$PREFIX"; then
     exit 1
 fi
 
+create_shortcuts=true
+#if linux
+printf "\\nThis installer can create shortcuts in your start menu."
+printf "\\nDo you want shortcuts in your start menu to run __NAME__? [yes|no]"
+printf "\\n[yes] >>> "
+read -r ans
+if [ "$ans" == "no" ] || [ "$ans" == "No" ] || [ "$ans" == "NO" ] && \
+    [ "$ans" == "n" ]   || [ "$ans" == "N" ]
+then
+    create_shortcuts=false
+fi
+#endif
+
 #if osx
 mkdir  "$PREFIX/__NAME__.app"
 mkdir  "$PREFIX/__NAME__.app/Contents"
@@ -438,11 +451,18 @@ CONDA_PKGS_DIRS="$PREFIX/pkgs" \
     rm -fr $PREFIX/pkgs/*.conda
 #endif
 
-## ==INSTALL_COMMANDS== ## NOTE: replaced __ with == to avoid macro expansion - I don't know what this does!
-
 POSTCONDA="$PREFIX/postconda.tar.bz2"
 "$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
 rm -f "$POSTCONDA"
+
+#if linux
+if $create_shortcuts
+then
+    sed -i "s%@@INSTALL_PATH@@%$PREFIX%g" *.desktop
+    mv -f *.desktop $HOME/.local/share/applications/
+    printf "\\nShortcuts created.\\n"
+fi
+#endif
 
 rm -f $PREFIX/conda.exe
 rm -f $PREFIX/pkgs/env.txt
@@ -487,58 +507,12 @@ printf "installation finished.\\n"
         #     printf "    directories of packages that are compatible with the Python interpreter\\n"
         #     printf "    in __NAME__: $PREFIX\\n"
         # fi
-
-        # if [ "$BATCH" = "0" ]; then
-        #     # Interactive mode.
-        # #if osx
-        #     BASH_RC="$HOME"/.bash_profile
-        #     DEFAULT=yes
-        # #else
-        #     BASH_RC="$HOME"/.bashrc
-        #     DEFAULT=no
-        # #endif
-        # #if initialize_by_default is True
-        #     DEFAULT=yes
-        # #endif
-        # #if initialize_by_default is False
-        #     DEFAULT=no
-        # #endif
-
-        # printf "Do you wish the installer to initialize __NAME__\\n"
-        # printf "by running conda init? [yes|no]\\n"
-        # printf "[%s] >>> " "$DEFAULT"
-        # read -r ans
-        # if [ "$ans" = "" ]; then
-        #     ans=$DEFAULT
-        # fi
-        # if [ "$ans" != "yes" ] && [ "$ans" != "Yes" ] && [ "$ans" != "YES" ] && \
-        # [ "$ans" != "y" ]   && [ "$ans" != "Y" ]
-        # then
-        #     printf "\\n"
-        #     printf "You have chosen to not have conda modify your shell scripts at all.\\n"
-        #     printf "To activate conda's base environment in your current shell session:\\n"
-        #     printf "\\n"
-        #     printf "eval \"\$($PREFIX/bin/conda shell.YOUR_SHELL_NAME hook)\" \\n"
-        #     printf "\\n"
-        #     printf "To install conda's shell functions for easier access, first activate, then:\\n"
-        #     printf "\\n"
-        #     printf "conda init\\n"
-        #     printf "\\n"
-        # else
-        #     if [[ $SHELL = *zsh ]]
-        #     then
-        #         $PREFIX/bin/conda init zsh
-        #     else
-        #         $PREFIX/bin/conda init
-        #     fi
-        # fi
-        # printf "If you'd prefer that conda's base environment not be activated on startup, \\n"
-        # printf "   set the auto_activate_base parameter to false: \\n"
-        # printf "\\n"
-        # printf "conda config --set auto_activate_base false\\n"
-        # printf "\\n"
-
+        if __IS_FINISH_LINK__
+        then
+        printf "\\n__FINISH_LINK_TEXT__\\n__FINISH_LINK_URL__\\n\\n"
+        fi
         printf "Thank you for installing __NAME__!\\n"
+
 
 # fi # !BATCH
 
