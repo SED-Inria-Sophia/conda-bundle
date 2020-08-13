@@ -1,4 +1,4 @@
 #!/bin/sh
-source ./bin/activate
 ./bin/conda-unpack
+source ./bin/activate
 ./__ENTRY_POINT__
