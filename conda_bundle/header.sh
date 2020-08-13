@@ -442,6 +442,11 @@ POSTCONDA="$PREFIX/postconda.tar.bz2"
 "$CONDA_EXEC" constructor --prefix "$PREFIX" --extract-tarball < "$POSTCONDA" || exit 1
 rm -f "$POSTCONDA"
 
+#if linux
+    sed -i "s%@@INSTALL_PATH@@%$PREFIX%g" *.desktop
+    mv -f *.desktop $HOME/.local/share/applications/
+#endif
+
 rm -f $PREFIX/conda.exe
 rm -f $PREFIX/pkgs/env.txt
 

@@ -2,9 +2,9 @@
 
 [Desktop Entry]
 Type=Application
-Exec=__INSTALL_PATH__/__ENTRY_POINT__ %u
-Icon=__INSTALL_PATH__/__ICON__
-Terminal=__IS_OPENING_TERMINAL__
+Exec=@@INSTALL_PATH@@/__ENTRY_POINT__ %u
+Icon=@@INSTALL_PATH@@/__ICON__
+Terminal=__TERMINAL__
 Name=__NAME__
 GenericName=__NAME__
 Categories=Science, Mathematics, Visualization
