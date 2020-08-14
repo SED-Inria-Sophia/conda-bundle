@@ -12,9 +12,9 @@ which contains one item per line (excluding lines starting with `#`).
 Also note, that any line in `construct.yaml` may contain a selector at the
 end, in order to allow customization for selected platforms.
 
-<h2>
-<a href="#new-keys">Jump to the new keys introduced with <b>conda-bundle<b></a>
-</h2>
+
+## <a href="#new-keys">Jump to the new keys introduced with <b>conda-bundle<b></a>
+
 
 ## `name`
 
