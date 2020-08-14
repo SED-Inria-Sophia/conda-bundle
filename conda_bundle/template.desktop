@@ -2,8 +2,8 @@
 
 [Desktop Entry]
 Type=Application
-Exec=@@INSTALL_PATH@@/__ENTRY_POINT__ %u
-Icon=@@INSTALL_PATH@@/__ICON__
+Exec=__ENTRY_POINT__ %u
+Icon=__ICON__
 Terminal=__TERMINAL__
 Name=__NAME__
 GenericName=__NAME__

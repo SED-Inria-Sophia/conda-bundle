@@ -168,9 +168,6 @@ def create(info, verbose=False):
 
 
     for i in info['shortcuts'].values():
-        #for key in 'path', 'icon', 'options':
-        #    if key in t:
-        #        t[key] = t[key].replace("__INSTALL_PATH__", "./")
         options = ""
         icon = i['path']
         terminal = False
@@ -179,9 +176,9 @@ def create(info, verbose=False):
         if 'icon' in i:
             icon = i["icon"]
         else:
-            icon = "default.png"
+            icon = "@@INSTALL_PATH@@/default.png"
             if not icon in t.getnames():
-                t.add(join(THIS_DIR, icon), basename(join(THIS_DIR, icon)))
+                t.add(join(THIS_DIR, "default.png"), basename(join(THIS_DIR, "default.png")))
         if 'terminal' in i:
             terminal = i["terminal"]
 
@@ -190,10 +187,14 @@ def create(info, verbose=False):
         'name': i['name'].lower(),
         'ENTRY_POINT': f"{i['path']} {options}",
         'ICON': f"{icon}",
-        'TERMINAL': f"{terminal}"
+        'TERMINAL': f"{terminal}",
         }
         data = read_desktop_template()
         data = fill_template(data, replace)
+        replace_entry = {
+            'INSTALL_PATH': '@@INSTALL_PATH@@'
+        }
+        data = fill_template(data, replace_entry)
         with open(join(tmp_dir, f"{i['name']}.desktop"), 'wb') as fo:
             fo.write(data.encode('utf-8'))
         os.chmod(join(tmp_dir, f"{i['name']}.desktop"), 0o755)

@@ -1,0 +1,56 @@
+name: dtkThemes
+version: 2.1.17
+
+install_in_dependency_order: True
+ignore_duplicate_files: True
+license_file: ..\..\LICENSE.md [win]
+#license_file: ../../LICENSE.md [unix]
+company: Inria
+
+# installer_type is always exe on Windows.
+
+# installer_type: tar.bz2 [linux]
+installer_type: sh [linux]
+
+# welcome_image: ..\..\doc\_static\logo.png [win]
+# welcome_image: ../../doc/_static/logo.png [unix]
+
+channels:
+  - http://repo.anaconda.com/pkgs/main/
+  - http://conda.anaconda.org/conda-forge/
+  - http://conda.anaconda.org/dtk-forge/
+specs:
+  - python=3.7
+  - conda
+  - dtk-themes
+
+#   - python=3.7
+#  - menuinst [win]
+#  - conda
+#  - console_shortcut
+#  - vtk=8.2.0=py37h7276a58_300 [win]
+#  - vtk=8.2.0 [unix]
+#  - sw2d=0.5.0b
+
+# Note: numbers 0, 1, ... have no meaning whatsoever. It's just to have multiple entries.
+# entries "name" and "path" are mandatory, "options" and "icon" are facultative.
+shortcuts:
+  1:
+    name: "dtkThemes Engine"
+    path: "__INSTALL_PATH__\\Library\\bin\\dtkThemesEngine.exe" [win]
+    path: "__INSTALL_PATH__/bin/dtkThemesEngine" [linux]
+    icon: "$WINDIR\\System32\\Bubbles.scr" [win] 
+    terminal: false [unix]
+  0:
+    name: "dtkThemes Prompt"
+    path: "$WINDIR\\System32\\cmd.exe" [win]
+    path: "__INSTALL_PATH__/bin/activate __INSTALL_PATH__/" [linux]
+    options: "$\\\"/K$\\\" __INSTALL_PATH__\\Scripts\\activate.bat __INSTALL_PATH__" [win]
+    terminal: true [unix]
+
+finish_link:
+    url: "https://dtk.gitlabpages.inria.fr/dtk-themes/"
+    text: "Open the documentation website"
+    
+win_register_shell: false
+ 
