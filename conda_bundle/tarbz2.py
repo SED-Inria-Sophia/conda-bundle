@@ -78,6 +78,11 @@ def create(info, verbose=False):
         }
         data = read_launch_template()
         data = fill_template(data, replace)
+        replace_entry = {
+            'INSTALL_PATH': '.'
+        }
+        data = fill_template(data, replace_entry)
+
         with open(join(tmp_dir, f"{t['name']}.sh"), 'wb') as fo:
             fo.write(data.encode('utf-8'))
         os.chmod(join(tmp_dir, f"{t['name']}.sh"), 0o755)

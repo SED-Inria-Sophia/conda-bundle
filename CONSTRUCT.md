@@ -12,7 +12,9 @@ which contains one item per line (excluding lines starting with `#`).
 Also note, that any line in `construct.yaml` may contain a selector at the
 end, in order to allow customization for selected platforms.
 
-
+<h2>
+<a href="#new-keys">Jump to the new keys introduced with <b>conda-bundle<b></a>
+</h2>
 
 ## `name`
 
@@ -141,15 +143,6 @@ argument type(s): ``str``,
 
 The filename of the installer being created.  A reasonable default filename
 will determined by the `name`, `version`, platform and installer type.
-
-## `installer_type`
-
-required: False
-
-argument type(s): ``str``, 
-
-The type of the installer being created.  Possible values are "sh", "pkg",
-and "exe".  By default, the type is "sh" on Unix, and "exe" on Windows.
 
 ## `license_file`
 
@@ -308,7 +301,7 @@ argument type(s): ``str``,
 If `header_image` is not provided, use this text when generating the image
 (Windows only). Defaults to `name`.
 
-<!-- >
+<!--
 ## `initialize_by_default`
 
 required: False
@@ -330,19 +323,31 @@ system's default Python. The user is still able to change this during
 interactive installation. (Windows only)
 -->
 
+<a id="new-keys"></a>
+
+# New and updated keys specific to `conda-bundle` 
+
+## `installer_type`
+
+required: False
+
+argument type(s): ``str``, 
+
+The type of the installer being created.  Possible values are "sh" and "tar.bz2" for Linux, and "exe" for Windows.  By default, the type is "sh" on Unix, and "exe" on Windows.
+
+
 ## `shortcuts`
 
 required: True (on Windows)
 
-argument types(s): ``dict``
+argument types(s): ``dict``, with keys  `name (string), path (string), options (string), icon (string), terminal (bool)`
 
 
-This lets you define shortcuts to be created on Windows. assuming the install folder is __INSTALL_PATH__:
+This lets you define shortcuts to be created on Windows. assuming the install folder is `__INSTALL_PATH__`:
 - for Linux usually bin/myapp
-- for macOS usually bin/myapp.app/Contents/MacOS/myapp
 - for Windows usually Library/bin/myapp.exe
 
-the dictionary has 4 fields: `name, path, options, icon`. `name` and `path` are mandatory. `options` and `icons` are facultative.
+The dictionary has 6 fields: `name, path, options, icon`, `terminal`. `name` and `path` are mandatory. `options`, `terminal` and `icons` are facultative. `terminal` is an option specific to Linux, set to **false** by default, that lets you open the programme within a terminal (useful to see command outputs for GUI app too)
 
 Example:
 
@@ -350,15 +355,19 @@ Example:
 shortcuts:
   the_app_shortcut:
     name: "MyProgram"
-    path: "__INSTALL_PATH__\\Library\\bin\\myProgram.exe"
+    path: "__INSTALL_PATH__\\Library\\bin\\myProgram.exe" [win]
+    path: "__INSTALL_PATH__/bin/myProgram" [linux]
     options: ""
-    icon: "$WINDIR\\System32\\Bubbles.scr" # You can put something like this: "__INSTALL_PATH__\\Menu\\app.ico"
+    icon: "__INSTALL_PATH__\\Menu\\app.ico" [win] # You can put a system icon too, like: "$WINDIR\\System32\\Bubbles.scr"
+    icon: "__INSTALL_PATH__/Menu/icon.png" [linux]
+    terminal: true
   the_conda_console_shortcut:
     name: "MyProgram Prompt"
     path: "$WINDIR\\System32\\cmd.exe"
     options: "$\\\"/K$\\\" __INSTALL_PATH__\\Scripts\\activate.bat __INSTALL_PATH__"
+
 ```
-Note: key names like `the_app_shortcut` or `the_conda_console_shortcut` are irrelevant, they could be named however you like, even `0, 1, 2`...
+Note: key names like `the_app_shortcut` or `the_conda_console_shortcut` don't matter, they could be named however you like, even `0, 1, 2`...
 
 ## `finish_link`
 
@@ -366,7 +375,7 @@ required: False
 
 argument types(s): ``dict``, with keys `url, text`
 
-A link to display at the end of the installer (for Windows) (there can be only one.)
+A link to display at the end of the installer (for Windows installer and Linux SH installer)
     url: the url
     text: the text to be displayed
 

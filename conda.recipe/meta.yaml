@@ -13,7 +13,6 @@ build:
   entry_points:
     - conda-bundle=conda_bundle.main:main
 
-
 requirements:
   host:
     - python
@@ -25,7 +24,7 @@ requirements:
     - conda-standalone
     - pillow >=3.1      # [win]
     - nsis >=3.01       # [win]
-    - conda-pack>=0.5.0 # [unix]
+    - conda-pack >=0.5.0 # [unix]
 
 test:
   imports:
