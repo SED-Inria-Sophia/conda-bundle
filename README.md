@@ -48,10 +48,18 @@ in <a href="./examples/dtkthemes">examples/dtkthemes</a>.
 
 ## Devel
 
-To build or update ``README.md`` at the root of the repo you'll need jinja2 installed
+To start developing with conda-bundle, you need to create a conda environment on UNIX systems with:
 
 ```
-conda install jinja2
+conda env create -f pkg/env/conda-bundle.yaml
 ```
 
-and then run ``make doc``. Or invoke the script directly with ``python scripts/make_docs.py``.
+(You'll need conda-pack for UNIX systems.)
+
+You should be able to build the recipe and create your package with:
+
+```
+conda build -c jolevy conda.recipe
+```
+
+Once you created your package, you can install it in your conda environment, and you can start tweaking the Python code directly in the install location to run it, test it, and check your changes. It should be installed in `anaconda3/lib/python3.7/site-packages/conda_bundle/`.
