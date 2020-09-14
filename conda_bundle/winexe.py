@@ -136,11 +136,11 @@ def make_nsi(info, dir_path):
     if 'finish_link' in info.keys():
         replace['FINISH_LINK_URL'] = info['finish_link']['url']
         replace['FINISH_LINK_TEXT'] = info['finish_link']['text']
-        replace['IS_FINISH_LINK'] = ""
+        replace['IS_FINISH_LINK'] = " "
     else:
         replace['FINISH_LINK_URL'] = "dummy" # these keys MUST be present in dict "replace", so I put dummy in them
         replace['FINISH_LINK_TEXT'] = "dummy"
-        replace['IS_FINISH_LINK'] = "#" # comment out that line
+        replace['IS_FINISH_LINK'] = "# " # comment out that line
 
 
     if 'win_register_shell' in info.keys():
