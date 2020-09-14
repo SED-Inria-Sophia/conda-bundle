@@ -15,11 +15,11 @@ build:
 
 requirements:
   host:
-    - python
+    - python >=3.7.0,<3.8.0
     - pip
   run:
     - conda >=4.6
-    - python
+    - python >=3.7.0,<3.8.0
     - ruamel_yaml >=0.11.14,<0.16
     - conda-standalone
     - pillow >=3.1      # [win]
