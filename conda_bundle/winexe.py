@@ -136,11 +136,9 @@ def make_nsi(info, dir_path):
     if 'finish_link' in info.keys():
         replace['FINISH_LINK_URL'] = info['finish_link']['url']
         replace['FINISH_LINK_TEXT'] = info['finish_link']['text']
-        replace['IS_FINISH_LINK'] = " "
     else:
-        replace['FINISH_LINK_URL'] = "dummy" # these keys MUST be present in dict "replace", so I put dummy in them
-        replace['FINISH_LINK_TEXT'] = "dummy"
-        replace['IS_FINISH_LINK'] = "# " # comment out that line
+        replace['FINISH_LINK_URL'] = "nothing" # these keys MUST be present in dict "replace", so I put dummy in them
+        replace['FINISH_LINK_TEXT'] = "nothing"
 
 
     if 'win_register_shell' in info.keys():
@@ -197,6 +195,8 @@ def make_nsi(info, dir_path):
         ("@REGISTRY_INSTDIR_KEY_EXE@", registry_key_commands),
         ("@START_MENU_DELETE_SHORTCUT_EXE@", start_menu_delete_commands),
         ("@DESKTOP_DELETE_SHORTCUT_EXE@", desktop_delete_commands),
+        ("@IS_FINISH_LINK@", "" if 'finish_link' in info.keys() else "#"),
+
         ]:
         data = data.replace(key, value)
 
