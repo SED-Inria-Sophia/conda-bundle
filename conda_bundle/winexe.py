@@ -138,6 +138,8 @@ def make_nsi(info, dir_path):
         replace['FINISH_LINK_TEXT'] = info['finish_link']['text']
         replace['IS_FINISH_LINK'] = ""
     else:
+        replace['FINISH_LINK_URL'] = "dummy" # these keys MUST be present in dict "replace", so I put dummy in them
+        replace['FINISH_LINK_TEXT'] = "dummy"
         replace['IS_FINISH_LINK'] = "#" # comment out that line
 
 
