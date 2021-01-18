@@ -95,6 +95,7 @@ def make_nsi(info, dir_path):
     registry_key_commands = ""
     start_menu_delete_commands = ""
     desktop_delete_commands = ""
+    registry_key_dpi_commands = "" # this will register our Qt 5.12 app in the registry to use System DPI on Windows (blurry, but scaled). Cause you know. Qt 5.12.
 
     # these are NSIS commands to create shortcuts, registry keys, and delete shortcuts.
     for t in info['shortcuts'].values():
@@ -109,9 +110,11 @@ def make_nsi(info, dir_path):
             icon = t["icon"]
         start_menu_commands = start_menu_commands + 'CreateShortCut "$SMPROGRAMS\\${PRODUCT_NAME}\\' + f'{t["name"]}.lnk" "{t["path"]}" "{options}" "{icon}"\n'
         desktop_commands = desktop_commands + f'CreateShortCut "$DESKTOP\\{t["name"]}.lnk" "{t["path"]}" "{options}" "{icon}"\n'
-        registry_key_commands = registry_key_commands + 'WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" ' + f'"{t["path"]}"\n'
+        registry_key_commands = registry_key_commands + 'WriteRegStr ${PRODUCT_REGISTER_KEY} "${PRODUCT_DIR_REGKEY}" "" ' + f'"{t["path"]}"\n'
         start_menu_delete_commands = start_menu_delete_commands + 'Delete "$SMPROGRAMS\\${PRODUCT_NAME}' + f'\\{t["name"]}.lnk"\n'
         desktop_delete_commands = desktop_delete_commands + f'Delete "$DESKTOP\\{t["name"]}.lnk"\n'
+        if t["path"].endswith(".exe") and (not t["path"].endswith("\\cmd.exe")):
+            registry_key_dpi_commands = registry_key_dpi_commands + 'WriteRegStr ${PRODUCT_REGISTER_KEY} ' + f'"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
 
     # these appear as __<key>__ in the template, and get escaped
     replace = {
@@ -193,6 +196,7 @@ def make_nsi(info, dir_path):
         ("@START_MENU_CREATE_SHORTCUT_EXE@",  start_menu_commands),
         ("@DESKTOP_CREATE_SHORTCUT_EXE@", desktop_commands),
         ("@REGISTRY_INSTDIR_KEY_EXE@", registry_key_commands),
+        ("@REGISTRY_KEY_DPI_COMMANDS@", registry_key_dpi_commands),
         ("@START_MENU_DELETE_SHORTCUT_EXE@", start_menu_delete_commands),
         ("@DESKTOP_DELETE_SHORTCUT_EXE@", desktop_delete_commands),
         ("@IS_FINISH_LINK@", "" if 'finish_link' in info.keys() else "#"),

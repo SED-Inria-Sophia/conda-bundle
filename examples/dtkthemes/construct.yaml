@@ -3,7 +3,7 @@ version: 2.1.17
 
 install_in_dependency_order: True
 ignore_duplicate_files: True
-license_file: ..\..\LICENSE.md [win]
+license_file: .\LICENSE.md [win]
 #license_file: ../../LICENSE.md [unix]
 company: Inria
 
@@ -52,5 +52,5 @@ finish_link:
     url: "https://dtk.gitlabpages.inria.fr/dtk-themes/"
     text: "Open the documentation website"
     
-win_register_shell: false
+win_register_shell: true
  

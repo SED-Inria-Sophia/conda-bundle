@@ -839,9 +839,6 @@ Section "Install"
 ${If} $CreateStartMenuShortcuts_State == ${BST_CHECKED}
     DetailPrint "Creating @NAME@ Start Menu shortcuts..."
 
-    # TODO: replace with keys
-    # CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
-    # CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\Library\bin\EXE_NAME" "" "$INSTDIR\Menu\app.ico"
     CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
     @START_MENU_CREATE_SHORTCUT_EXE@
 ${EndIf}
@@ -861,6 +858,8 @@ ${If} $RegisterShell_State == ${BST_CHECKED}
     WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}" "Icon" "$WINDIR\System32\cmd.exe"
     WriteRegStr ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\shell\${NAME}\command" "" "$WINDIR\System32\cmd.exe $\"/K$\" $INSTDIR\Scripts\activate.bat $INSTDIR && cd $\"%V$\""
 ${EndIf}
+
+    @REGISTRY_KEY_DPI_COMMANDS@
 /*
     push '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\Lib\_nsis.py" mkdirs'
     push 'Failed to initialize Anaconda directories'
@@ -869,8 +868,6 @@ ${EndIf}
     WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "InstallDir" "$INSTDIR"
     WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "Version" "${VERSION}"
 
-    # TODO: replace with keys
-    # WriteRegStr HKCU "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\Library\bin\${EXE_NAME}"
     @REGISTRY_INSTDIR_KEY_EXE@
     
 
@@ -901,11 +898,6 @@ Section "Uninstall"
     # Remove menu items, path entries
 
     DetailPrint "Deleting @NAME@ menus..."
-
-
-    # TODO: replace with keys
-    # Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
-    # Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
 
 # ${If} $CreateStartMenuShortcuts == ${BST_CHECKED}
     @START_MENU_DELETE_SHORTCUT_EXE@
