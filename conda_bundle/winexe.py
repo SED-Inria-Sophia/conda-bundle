@@ -96,6 +96,8 @@ def make_nsi(info, dir_path):
     start_menu_delete_commands = ""
     desktop_delete_commands = ""
     registry_key_dpi_commands = "" # this will register our Qt 5.12 app in the registry to use System DPI on Windows (blurry, but scaled). Cause you know. Qt 5.12.
+    post_install_commands = "" # these will be calls to the post-install scripts (python)
+    post_install_files = ""
 
     # these are NSIS commands to create shortcuts, registry keys, and delete shortcuts.
     for t in info['shortcuts'].values():
@@ -108,6 +110,7 @@ def make_nsi(info, dir_path):
             options = t['options']
         if 'icon' in t:
             icon = t["icon"]
+            
         start_menu_commands = start_menu_commands + 'CreateShortCut "$SMPROGRAMS\\${PRODUCT_NAME}\\' + f'{t["name"]}.lnk" "{t["path"]}" "{options}" "{icon}"\n'
         desktop_commands = desktop_commands + f'CreateShortCut "$DESKTOP\\{t["name"]}.lnk" "{t["path"]}" "{options}" "{icon}"\n'
         registry_key_commands = registry_key_commands + 'WriteRegStr ${PRODUCT_REGISTER_KEY} "${PRODUCT_DIR_REGKEY}" "" ' + f'"{t["path"]}"\n'
@@ -116,6 +119,23 @@ def make_nsi(info, dir_path):
         if t["path"].endswith(".exe") and (not t["path"].endswith("\\cmd.exe")):
             registry_key_dpi_commands = registry_key_dpi_commands + 'WriteRegStr ${PRODUCT_REGISTER_KEY} ' + f'"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
 
+    for t in info['optional_post_install'].values():
+            post_install_files = post_install_files + f"""
+            File "{abspath(t["py_script"])}"\n
+            """
+
+            post_install_commands = post_install_commands + f"""
+            # ${{If}} $Ana_PostInstall_State = ${{BST_CHECKED}}
+                DetailPrint "Running post install: {t["py_script"]} ..."
+                nsExec::ExecToLog '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\{t["py_script"]}"'
+                Pop $0
+            #    push 'Failed to run post install script'
+            #    call AbortRetryNSExecWait
+            #${{EndIf}}
+            \n
+            """
+
+    
     # these appear as __<key>__ in the template, and get escaped
     replace = {
         'NAME': name,
@@ -200,7 +220,8 @@ def make_nsi(info, dir_path):
         ("@START_MENU_DELETE_SHORTCUT_EXE@", start_menu_delete_commands),
         ("@DESKTOP_DELETE_SHORTCUT_EXE@", desktop_delete_commands),
         ("@IS_FINISH_LINK@", "" if 'finish_link' in info.keys() else "#"),
-
+        ("@POST_INSTALL_SCRIPTS@", post_install_commands),
+        ("@FILE_OPTIONAL_POST_INSTALL_SCRIPTS@", post_install_files),
         ]:
         data = data.replace(key, value)
 
@@ -214,6 +235,7 @@ def make_nsi(info, dir_path):
                         join(dir_path, fn))
 
     print('Created %s file' % nsi_path)
+    os.system(f'{nsi_path}') # yup all files are executable on Windows. It will open in your favorite text editor.
     return nsi_path
 
 

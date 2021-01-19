@@ -1,5 +1,5 @@
-name: dtkThemes
-version: 2.1.17
+name: mini_nsis
+version: 0.1
 
 install_in_dependency_order: True
 ignore_duplicate_files: True
@@ -20,9 +20,7 @@ channels:
   - http://conda.anaconda.org/conda-forge/
   - http://conda.anaconda.org/dtk-forge/
 specs:
-  - python=3.7
-  - conda
-  - dtk-themes
+  - zlib
 
 #   - python=3.7
 #  - menuinst [win]
@@ -35,28 +33,29 @@ specs:
 # Note: numbers 0, 1, ... have no meaning whatsoever. It's just to have multiple entries.
 # entries "name" and "path" are mandatory, "options" and "icon" are facultative.
 shortcuts:
-  1:
-    name: "dtkThemes Engine"
-    path: "__INSTALL_PATH__\\Library\\bin\\dtkThemesEngine.exe" [win]
-    path: "__INSTALL_PATH__/bin/dtkThemesEngine" [linux]
-    icon: "$WINDIR\\System32\\Bubbles.scr" [win] 
-    terminal: false [unix]
   0:
-    name: "dtkThemes Prompt"
+    name: "MyProgram Prompt"
     path: "$WINDIR\\System32\\cmd.exe" [win]
     path: "__INSTALL_PATH__/bin/activate __INSTALL_PATH__/" [linux]
     options: "$\\\"/K$\\\" __INSTALL_PATH__\\Scripts\\activate.bat __INSTALL_PATH__" [win]
     terminal: true [unix]
+  # 1:
+  #   name: "dtkThemes Engine"
+  #   path: "__INSTALL_PATH__\\Library\\bin\\dtkThemesEngine.exe" [win]
+  #   path: "__INSTALL_PATH__/bin/dtkThemesEngine" [linux]
+  #   icon: "$WINDIR\\System32\\Bubbles.scr" [win] 
+  #   terminal: false [unix]
 
 finish_link:
     url: "https://dtk.gitlabpages.inria.fr/dtk-themes/"
     text: "Open the documentation website"
 
+# for the moment, optional_post_install does't accept any parameter.
 optional_post_install:
   0:
     default: true
     py_script: "post_install_example.py"
     text: "Run the post-install script post_install_example.py"
     
-win_register_shell: true
+win_register_shell: false
  

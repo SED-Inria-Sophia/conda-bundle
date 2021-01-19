@@ -46,7 +46,7 @@ Unicode "true"
 
 var /global INSTDIR_JUSTME
 
-!define INSTDIR_ALLUSERS "$%ALLUSERSPROFILE%\${NAME}"
+!define INSTDIR_ALLUSERS "$%PROGRAMFILES%\${NAME}"
 
 # UAC shield overlay
 !ifndef BCM_SETSHIELD
@@ -130,6 +130,7 @@ Page Custom InstModePage_Create InstModePage_Leave
 # Custom options now differ depending on installation mode.
 # Page Custom mui_AnaCustomOptions_Show ;Used to register conda to path, disabled in our case.
 Page Custom mui_CustomShortcuts_Show
+# Page Custom mui_CustomOptionalPostInstallScripts_show ;TODO: add custom page to enable Post Install Scripts
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -794,6 +795,9 @@ Section "Install"
     File "@NSIS_DIR@\_nsis.py"
     File "@NSIS_DIR@\_system_path.py"
 
+    SetOutPath "$INSTDIR"
+    @FILE_OPTIONAL_POST_INSTALL_SCRIPTS@
+
     ReadEnvStr $0 SystemRoot
     # set PATH for the installer process, so that MSVC runtimes get found OK
     #    This is also isolating PATH to be just us and Windows core stuff, which hopefully avoids
@@ -888,6 +892,8 @@ ${EndIf}
 
 
     WriteUninstaller "$INSTDIR\Uninstall-${NAME}.exe"
+
+    @POST_INSTALL_SCRIPTS@
 
     ## cleanup pkgs
     Delete "$INSTDIR\pkgs\*.*"
