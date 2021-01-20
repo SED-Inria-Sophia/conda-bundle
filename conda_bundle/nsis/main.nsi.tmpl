@@ -46,7 +46,7 @@ Unicode "true"
 
 var /global INSTDIR_JUSTME
 
-!define INSTDIR_ALLUSERS "$%PROGRAMFILES%\${NAME}"
+!define INSTDIR_ALLUSERS "$PROGRAMFILES\${NAME}"
 
 # UAC shield overlay
 !ifndef BCM_SETSHIELD
@@ -913,6 +913,9 @@ Section "Uninstall"
     @DESKTOP_DELETE_SHORTCUT_EXE@
     RMDir "$SMPROGRAMS\${PRODUCT_NAME}"
 # ${EndIf}
+
+
+    @REGISTRY_DELETE_KEY_DPI_COMMANDS@
 
 # ${If} $RegisterShell == ${BST_CHECKED}
     DeleteRegKey ${PRODUCT_REGISTER_KEY} "SOFTWARE\Classes\Directory\Background\shell\${NAME}"

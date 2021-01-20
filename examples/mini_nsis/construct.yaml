@@ -50,7 +50,7 @@ finish_link:
     url: "https://dtk.gitlabpages.inria.fr/dtk-themes/"
     text: "Open the documentation website"
 
-# for the moment, optional_post_install does't accept any parameter.
+# for the moment, optional_post_install doesn't accept any parameter.
 optional_post_install:
   0:
     default: true

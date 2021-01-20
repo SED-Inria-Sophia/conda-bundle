@@ -96,6 +96,7 @@ def make_nsi(info, dir_path):
     start_menu_delete_commands = ""
     desktop_delete_commands = ""
     registry_key_dpi_commands = "" # this will register our Qt 5.12 app in the registry to use System DPI on Windows (blurry, but scaled). Cause you know. Qt 5.12.
+    registry_delete_key_dpi_commands = ""
     post_install_commands = "" # these will be calls to the post-install scripts (python)
     post_install_files = ""
 
@@ -117,22 +118,22 @@ def make_nsi(info, dir_path):
         start_menu_delete_commands = start_menu_delete_commands + 'Delete "$SMPROGRAMS\\${PRODUCT_NAME}' + f'\\{t["name"]}.lnk"\n'
         desktop_delete_commands = desktop_delete_commands + f'Delete "$DESKTOP\\{t["name"]}.lnk"\n'
         if t["path"].endswith(".exe") and (not t["path"].endswith("\\cmd.exe")):
-            registry_key_dpi_commands = registry_key_dpi_commands + 'WriteRegStr ${PRODUCT_REGISTER_KEY} ' + f'"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
-
+            registry_key_dpi_commands = registry_key_dpi_commands + f'WriteRegStr ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
+            registry_delete_key_dpi_commands = registry_delete_key_dpi_commands + f'DeleteRegValue ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}"'
     for t in info['optional_post_install'].values():
             post_install_files = post_install_files + f"""
             File "{abspath(t["py_script"])}"\n
             """
 
             post_install_commands = post_install_commands + f"""
-            # Note: this runs in folder $INSTDIR\conda-meta for some reason.
+            # Note: this runs in folder $INSTDIR\\conda-meta for some reason.
             
             # ${{If}} $Ana_PostInstall_State = ${{BST_CHECKED}}
                 DetailPrint "Running post install: {t["py_script"]} ..."
-                nsExec::ExecToLog '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\{t["py_script"]}"'
+                nsExec::ExecToLog '"$INSTDIR\\pythonw.exe" -E -s "$INSTDIR\\{t["py_script"]}"'
                 Pop $0
             #    push 'Failed to run post install script'
-            #    call AbortRetryNSExecWait
+            #    call AbortRetryNSExecWait 
             #${{EndIf}}
             \n
             """
@@ -219,6 +220,7 @@ def make_nsi(info, dir_path):
         ("@DESKTOP_CREATE_SHORTCUT_EXE@", desktop_commands),
         ("@REGISTRY_INSTDIR_KEY_EXE@", registry_key_commands),
         ("@REGISTRY_KEY_DPI_COMMANDS@", registry_key_dpi_commands),
+        ("@REGISTRY_DELETE_KEY_DPI_COMMANDS@", registry_delete_key_dpi_commands),
         ("@START_MENU_DELETE_SHORTCUT_EXE@", start_menu_delete_commands),
         ("@DESKTOP_DELETE_SHORTCUT_EXE@", desktop_delete_commands),
         ("@IS_FINISH_LINK@", "" if 'finish_link' in info.keys() else "#"),
