@@ -125,6 +125,8 @@ def make_nsi(info, dir_path):
             """
 
             post_install_commands = post_install_commands + f"""
+            # Note: this runs in folder $INSTDIR\conda-meta for some reason.
+            
             # ${{If}} $Ana_PostInstall_State = ${{BST_CHECKED}}
                 DetailPrint "Running post install: {t["py_script"]} ..."
                 nsExec::ExecToLog '"$INSTDIR\pythonw.exe" -E -s "$INSTDIR\{t["py_script"]}"'

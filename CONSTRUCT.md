@@ -394,6 +394,24 @@ argument types(s): ``bool``
 
 whether or not to let the user to register its shell. This adds a shortcut to the right-click menu in Windows Explorer so that you can open the local Conda prompt of the project in any folder on Windows. It comes in handy if your program has many command-line tools.
 
+## `optional_post_install`
+
+required : False
+
+argument type(s): ``dict``, with keys: `default (bool)`, `py_script (string, path to stript)`, `text (string)`
+
+Post-install script that may or may not be run after installation. Could be downloading remote resources or whatnot.
+
+example:
+```yaml
+optional_post_install:
+  a_dummy_key_for_the_first_script:
+    default: true
+    py_script: "./post_install_example.py"
+    text: "Run the post-install script post_install_example.py"
+
+```
+
 ## List of available selectors:
 
 - ``aarch64``
