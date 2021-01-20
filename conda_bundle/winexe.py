@@ -120,7 +120,8 @@ def make_nsi(info, dir_path):
         if t["path"].endswith(".exe") and (not t["path"].endswith("\\cmd.exe")):
             registry_key_dpi_commands = registry_key_dpi_commands + f'WriteRegStr ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
             registry_delete_key_dpi_commands = registry_delete_key_dpi_commands + f'DeleteRegValue ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}"'
-    for t in info['optional_post_install'].values():
+    if 'optional_post_install' in info:
+        for t in info['optional_post_install'].values():
             post_install_files = post_install_files + f"""
             File "{abspath(t["py_script"])}"\n
             """
