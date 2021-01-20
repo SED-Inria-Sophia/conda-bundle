@@ -240,7 +240,6 @@ def make_nsi(info, dir_path):
                         join(dir_path, fn))
 
     print('Created %s file' % nsi_path)
-    os.system(f'{nsi_path}') # yup all files are executable on Windows. It will open in your favorite text editor.
     return nsi_path
 
 
