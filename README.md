@@ -21,6 +21,41 @@ Currently conda-bundle supports Windows and Linux.
 macOS is currently unsupported due to Apple policy of signing every app with an Apple Developer Certificate, which hasn't been investigated for the time being.
 
 
+## Devel
+
+To start developing with conda-bundle, you need to create a conda environment on UNIX systems with:
+
+```
+conda env create -f pkg/env/conda-bundle.yaml
+```
+
+You should be able to build the recipe and create your package with:
+
+```
+conda build -c jolevy conda.recipe
+```
+
+Once you created your package, you can install it in your conda environment, and you can start tweaking the Python code directly in the install location to run it, test it, and check your changes. It should be installed in `.../lib/python3.7/site-packages/conda_bundle/` or `.../Lib/site-packages/conda_bundle` for Windows.
+
+## Branch policy
+
+`master` will be when we'll have a release (not anytime soon)
+`develop` is the default branch for building packages at the moment
+branches `windows`, `linux` and `macos` all originate from `develop`. 
+You should make features in your OS branch like `windows/feature/my-cool-stuff`, then merge into branch `windows`, then when you feel ready merge into branch `develop`. This allows features to be developed on a specific OS when we need it, and you can hook your Continuous Integration to look for the right branch for the right OS.
+
+```
+Example of branch management:
+
+-- master ---------------
+-- develop----\                                                            /---develop---
+               \---windows------                                          /
+                \---macos---------                                       /
+                 \--linux---\                               /---linux---/
+                             \----linux/feature/my-stuff---/
+```
+
+
 ## Installation:
 
 `conda-bundle` can be installed into the base environment using:
@@ -45,21 +80,3 @@ license file, and image files for the Windows installer).
 An example is located
 in <a href="./examples/dtkthemes">examples/dtkthemes</a>.
 
-
-## Devel
-
-To start developing with conda-bundle, you need to create a conda environment on UNIX systems with:
-
-```
-conda env create -f pkg/env/conda-bundle.yaml
-```
-
-(You'll need conda-pack for UNIX systems.)
-
-You should be able to build the recipe and create your package with:
-
-```
-conda build -c jolevy conda.recipe
-```
-
-Once you created your package, you can install it in your conda environment, and you can start tweaking the Python code directly in the install location to run it, test it, and check your changes. It should be installed in `anaconda3/lib/python3.7/site-packages/conda_bundle/`.
