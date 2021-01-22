@@ -214,6 +214,8 @@ a the link to display at the end of the installer (for Windows) (yeah there can 
     ('win_register_shell', False, bool, '''
 whether or not to let the user to register its shell to open the embedded Conda console in any folder of the Windows Explorer.
     '''),
+    ## TODO: implement optional_post_install scripts in installer scripts (winexe.py, ospkg.py, shar.py
+    ## TODO: I left that so that the key does not raise an error when construct.yaml is parsed.
     ('optional_post_install',  False, dict, '''
  post install scripts in python
   '''),

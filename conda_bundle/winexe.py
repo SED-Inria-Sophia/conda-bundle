@@ -97,8 +97,10 @@ def make_nsi(info, dir_path):
     desktop_delete_commands = ""
     registry_key_dpi_commands = "" # this will register our Qt 5.12 app in the registry to use System DPI on Windows (blurry, but scaled). Cause you know. Qt 5.12.
     registry_delete_key_dpi_commands = ""
+
+    ## TODO: support post_install scripts (for now they're in the YAML folder, but they should be in the conda packages instead.)
     post_install_commands = "" # these will be calls to the post-install scripts (python)
-    post_install_files = ""
+    post_install_files = "" # these will be import commands "File" for NSIS to import script files into the installer.
 
     # these are NSIS commands to create shortcuts, registry keys, and delete shortcuts.
     for t in info['shortcuts'].values():
@@ -120,24 +122,29 @@ def make_nsi(info, dir_path):
         if t["path"].endswith(".exe") and (not t["path"].endswith("\\cmd.exe")):
             registry_key_dpi_commands = registry_key_dpi_commands + f'WriteRegStr ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}" "~ PERPROCESSSYSTEMDPIFORCEON GDIDPISCALING DPIUNAWARE"\n'
             registry_delete_key_dpi_commands = registry_delete_key_dpi_commands + f'DeleteRegValue ${{PRODUCT_REGISTER_KEY}} "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers" "{t["path"]}"'
-    if 'optional_post_install' in info:
-        for t in info['optional_post_install'].values():
-            post_install_files = post_install_files + f"""
-            File "{abspath(t["py_script"])}"\n
-            """
+    
+    
+    ## TODO: add post_install scripts. This is commented out for the moment.
+    ## TODO: they use the python script in the construct folder at the moment (it's just for test.)
+    ## TODO: it should use files in the distribution folder instead.
+    # if 'optional_post_install' in info:
+    #     for t in info['optional_post_install'].values():
+    #         post_install_files = post_install_files + f"""
+    #         File "{abspath(t["py_script"])}"\n
+    #         """
 
-            post_install_commands = post_install_commands + f"""
-            # Note: this runs in folder $INSTDIR\\conda-meta for some reason.
+    #         post_install_commands = post_install_commands + f"""
+    #         # Note: this runs in folder $INSTDIR\\conda-meta for some reason.
             
-            # ${{If}} $Ana_PostInstall_State = ${{BST_CHECKED}}
-                DetailPrint "Running post install: {t["py_script"]} ..."
-                nsExec::ExecToLog '"$INSTDIR\\pythonw.exe" -E -s "$INSTDIR\\{t["py_script"]}"'
-                Pop $0
-            #    push 'Failed to run post install script'
-            #    call AbortRetryNSExecWait 
-            #${{EndIf}}
-            \n
-            """
+    #         # ${{If}} $Ana_PostInstall_State = ${{BST_CHECKED}}
+    #             DetailPrint "Running post install: {t["py_script"]} ..."
+    #             nsExec::ExecToLog '"$INSTDIR\\pythonw.exe" -E -s "$INSTDIR\\{t["py_script"]}"'
+    #             Pop $0
+    #         #    push 'Failed to run post install script'
+    #         #    call AbortRetryNSExecWait 
+    #         #${{EndIf}}
+    #         \n
+    #         """
 
     
     # these appear as __<key>__ in the template, and get escaped
@@ -153,10 +160,10 @@ def make_nsi(info, dir_path):
         'OUTFILE': info['_outpath'],
         'LICENSEFILE': abspath(info.get('license_file',
                                join(NSIS_DIR, 'placeholder_license.txt'))),
-        'DEFAULT_PREFIX': info.get(
-            'default_prefix',
-            join('%LOCALAPPDATA%', name.lower())
-        ),
+        # 'DEFAULT_PREFIX': info.get(
+        #     'default_prefix',
+        #     join('%LOCALAPPDATA%', name.lower())
+        # ), # this is not used any more, paths are fixed in NSIS template.
         'POST_INSTALL_DESC': info['post_install_desc'],
     }
 

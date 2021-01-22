@@ -12,12 +12,17 @@
 
 # Code:
 
-name: conda-bundle
+name: conda-bundle2
 channels:
   - jolevy
 dependencies:
   - python = 3.7.6
-  - conda-pack >= 0.5.0 [unix]
+  - jolevy::conda-pack >= 0.5.0 [unix]
+
+# note: the forked conda-pack on my account has some patches to re-write binary paths in dependencies.
+# it could be pursued to create archive-ready program distribution.
+# I started that when conda-pack was stuck at 0.4.0 with no maintainer, but now they restarted the development with new people.
+# It could be a good idea to check on what they did recently.
 
 #
 # conda-bundle.yaml ends here
