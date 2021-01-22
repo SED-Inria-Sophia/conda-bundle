@@ -28,7 +28,6 @@ Unicode "true"
 !define PY_VER __PY_VER__
 !define PYVERSION_JUSTDIGITS __PYVERSION_JUSTDIGITS__
 !define PYVERSION __PYVERSION__
-!define DEFAULT_PREFIX __DEFAULT_PREFIX__
 !define POST_INSTALL_DESC __POST_INSTALL_DESC__
 !define PRODUCT_NAME "${NAME} ${VERSION} (${ARCH})"
 !define UNINSTALL_NAME "@UNINSTALL_NAME@"
@@ -39,14 +38,18 @@ Unicode "true"
 !define PRODUCT_UNINST_ROOT_KEY "HKCU"
 !define MUI_LANGDLL_REGISTRY_ROOT "HKCU"
 !define PRODUCT_REGISTER_KEY "HKCU" ; this will register the program for the user. it can be changed to HKLM to register for all users.
-# !define EXE_NAME "${NAME}.exe" 
-# WARNING: I'M MAKING A HUGE ASSUMPTION THAT MY EXE IS CALLED NAME.EXE
 
 !define ALLOW_REGISTER_SHELL __ALLOW_REGISTER_SHELL__
 
 var /global INSTDIR_JUSTME
 
-!define INSTDIR_ALLUSERS "$PROGRAMFILES\${NAME}"
+
+Var /GLOBAL USERNAME
+Var /GLOBAL HOMEDRIVE
+!define DEFAULT_PREFIX "$HOMEDRIVE\$USERNAME\${NAME}"
+!define INSTDIR_ALLUSERS "$HOMEDRIVE\${NAME}"
+
+
 
 # UAC shield overlay
 !ifndef BCM_SETSHIELD
@@ -415,6 +418,11 @@ Function .onInit
         SetErrorLevel 0x666
         Quit
     ${EndIf}
+
+    ReadEnvStr $0 USERNAME
+    ReadEnvStr $1 HOMEDRIVE
+    StrCpy $HOMEDRIVE $1
+    ${StrFilter} $0 "12" "" "" $USERNAME
 
     # Look for a number of signs that indicate the user is a domain user and
     # alter the default installation directory for 'Just Me' accordingly.  We
