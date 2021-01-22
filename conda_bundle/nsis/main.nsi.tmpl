@@ -420,7 +420,7 @@ Function .onInit
     ${EndIf}
 
     ReadEnvStr $0 USERNAME
-    ReadEnvStr $1 HOMEDRIVE
+    ReadEnvStr $1 PROGRAMDATA
     StrCpy $HOMEDRIVE $1
     ${StrFilter} $0 "12" "" "" $USERNAME
 
